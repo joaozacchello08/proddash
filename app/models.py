@@ -49,7 +49,7 @@ class Dashboard(db.Model):
     __tablename__ = "dashboards"
 
     id:             Mapped[int] = mapped_column(db.Integer, primary_key=True)
-    user_id:        Mapped[int] = mapped_column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    user_id:        Mapped[int] = mapped_column(db.Integer, db.ForeignKey("users.id"), unique=True, nullable=False)
     dashboard_name: Mapped[str] = mapped_column(db.String(30), unique=False, nullable=False)
 
     created_at:     Mapped[datetime] = mapped_column(db.DateTime, default=lambda: datetime.now())

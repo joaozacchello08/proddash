@@ -18,7 +18,7 @@ def create_app():
     CORS(app)
     register_routes(app)
 
-    # errors handler
+    #region errors handler
     @app.errorhandler(400)
     def bad_request(error):
         return jsonify({ "error": "Bad request." }), 400
@@ -39,5 +39,6 @@ def create_app():
     def internal_server_error(error):
         db.session.rollback()
         return jsonify({ "error": "Internal server error." }), 500
+    #endregion
 
     return app

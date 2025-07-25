@@ -54,7 +54,7 @@ def get_user(user_id: int):
 
     return jsonify({ "user": user.serialize() }), 200
 
-@user_bp.route("/", methods=["GET"])
+@user_bp.route("/random", methods=["GET"])
 def get_random_user():
     random_user = User.query.order_by(func.random()).first()
     
@@ -62,6 +62,13 @@ def get_random_user():
         abort(404)
 
     return jsonify({ "random_user": random_user.serialize() }), 200
+
+@user_bp.route("/by-username/<string:username>", methods=["GET"])
+def get_user_by_username(username: str):
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        abort(404)
+    return jsonify({ "user": user.serialize() }), 200
 
 @user_bp.route("/login", methods=["POST"])
 def login_user():
