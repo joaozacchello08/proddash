@@ -101,15 +101,15 @@ def update_user():
     if not body:
         abort(400)
 
-    email = body.get("email")
-    # username = body.get("username")
+    # email = body.get("email")
+    username = body.get("username")
     password = body.get("password")
     updates = body.get("updates")
 
-    if not all([email, password]):
+    if not all([username, password]):
         abort(400)
 
-    user = User.query.filter_by(email=email).first()
+    user = User.query.filter_by(username=username).first()
 
     if not user:
         abort(404)
@@ -141,13 +141,13 @@ def delete_user():
     if not body:
         abort(400)
 
-    email = body.get("email")
+    username = body.get("email")
     password = body.get("password")
 
-    if not all([email, password]):
+    if not all([username, password]):
         abort(400)
 
-    user = User.query.filter_by(email=email).first()
+    user = User.query.filter_by(username=username).first()
     if not user:
         abort(404)
 

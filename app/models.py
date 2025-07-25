@@ -7,7 +7,7 @@ class User(db.Model):
     __tablename__ = "users"
 
     id:            Mapped[int]  = mapped_column(db.Integer, primary_key=True)
-    username:      Mapped[str]  = mapped_column(db.String(50), unique=False, nullable=False)
+    username:      Mapped[str]  = mapped_column(db.String(50), unique=True, nullable=False)
     email:         Mapped[str]  = mapped_column(db.String(100), unique=True, nullable=False)
     password_hash: Mapped[str]  = mapped_column(db.String(128), nullable=False)
     first_name:    Mapped[str]  = mapped_column(db.String(30), nullable=True)
