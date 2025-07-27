@@ -5,3 +5,4 @@ SQLAlchemy==2.0.41
 psycopg2-binary==2.9.10
 bcrypt==4.3.0
 passlib==1.7.4
+Faker==37.4.2

@@ -1,6 +1,6 @@
 from .extensions import db
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, UniqueConstraint
 from passlib.hash import bcrypt
 from datetime import datetime
 
@@ -45,7 +45,8 @@ class User(db.Model):
             "username":   self.username,
             "firstName":  self.first_name,
             "lastName":   self.last_name,
-            "createdAt":  self.created_at.isoformat() if self.created_at else None
+            "createdAt":  self.created_at.isoformat() if self.created_at else None,
+            "dashboard":  self.dashboard.serialize()
         }
     
     def __repr__(self) -> str:
@@ -89,12 +90,12 @@ class Product(db.Model):
     id:              Mapped[int]           = mapped_column(db.Integer, primary_key=True)
     dashboard_id:    Mapped[int]           = mapped_column(db.Integer, ForeignKey("dashboards.id"), nullable=False)
 
-    product_name:    Mapped[str]           = mapped_column(db.String(32), unique=True, nullable=False)
+    product_name:    Mapped[str]           = mapped_column(db.String(100), nullable=False)
     product_image:   Mapped[str]           = mapped_column(db.Text, nullable=True)
 
     product_price:   Mapped[float]         = mapped_column(db.Float, nullable=False)
     product_cost:    Mapped[float]         = mapped_column(db.Float, nullable=True)
-    product_barcode: Mapped[str]           = mapped_column(db.String(14), unique=True, nullable=True)
+    product_barcode: Mapped[str]           = mapped_column(db.String(14), nullable=True)
     product_stock:   Mapped[int]           = mapped_column(db.Integer, default=0)
 
     created_at:      Mapped[datetime]      = mapped_column(db.DateTime, default=lambda: datetime.now())
@@ -102,6 +103,13 @@ class Product(db.Model):
     # relationships
     dashboard:       Mapped["Dashboard"]   = relationship(back_populates="products")
     sales:           Mapped[list["Venda"]] = relationship(back_populates="product")
+
+    # table args - make product_name and product_barcode unique ONLY on the dashboard
+    __table_args__ = (
+        UniqueConstraint("dashboard_id", "product_name", name="_dashboard_product_name_uc"),
+        UniqueConstraint("dashboard_id", "product_barcode", name="_dashboard_product_barcode_uc")
+    )
+
 
     # ...
     # def __init__(self, product_name: str, product_stock: int, product_price: float, product_image: str = None, product_barcode: str = None) -> None:
@@ -116,12 +124,14 @@ class Product(db.Model):
     def serialize(self) -> dict:
         return {
             "productId":      self.id,
+            "dashboardId":    self.dashboard_id,
             "productName":    self.product_name,
             "productPrice":   self.product_price,
             "productImage":   self.product_image,
             "productBarcode": self.product_barcode,
             "productStock":   self.product_stock,
-            "createdAt":      self.created_at.isoformat() if self.created_at else None
+            "createdAt":      self.created_at.isoformat() if self.created_at else None,
+            "productCost": self.product_cost
         }
 
     def __repr__(self) -> str:

@@ -6,40 +6,41 @@ from app.models import Dashboard, User
 dashboard_bp = Blueprint("dashboard_bp", __name__)
 
 #region CREATE
-@dashboard_bp.route("/", methods=["POST"])
-def create_dashboard():
-    body = request.json
+# @dashboard_bp.route("/", methods=["POST"])
+# def create_dashboard():
+#     pass
+#     body = request.json
 
-    if not body:
-        abort(400)
+#     if not body:
+#         abort(400)
 
-    username = body.get("username")
-    password = body.get("password")
-    dashboard_name = body.get("dashboard_name")
+#     username = body.get("username")
+#     password = body.get("password")
+#     dashboard_name = body.get("dashboard_name")
 
-    if not all([username, dashboard_name, password]):
-        abort(400)
+#     if not all([username, dashboard_name, password]):
+#         abort(400)
 
-    user = User.query.filter_by(username=username).first()
-    if not user:
-        abort(404)
+#     user = User.query.filter_by(username=username).first()
+#     if not user:
+#         abort(404)
 
-    if user.check_password(password) is False:
-        abort(403)
+#     if user.check_password(password) is False:
+#         abort(403)
 
-    dashboard = Dashboard(user_id=user.id, dashboard_name=dashboard_name)
+#     dashboard = Dashboard(user_id=user.id, dashboard_name=dashboard_name)
     
-    if Dashboard.query.filter_by(user_id=user.id).first():
-        abort(409)
+#     if Dashboard.query.filter_by(user_id=user.id).first():
+#         abort(409)
     
-    try:
-        db.session.add(dashboard)
-        db.session.commit()
-    except Exception as e:
-        print(f"Error: {str(e)}")
-        abort(500)
+#     try:
+#         db.session.add(dashboard)
+#         db.session.commit()
+#     except Exception as e:
+#         print(f"Error: {str(e)}")
+#         abort(500)
 
-    return jsonify({ "message": "Dashboard created successfully!", "created_dashboard": dashboard.serialize() }), 201
+#     return jsonify({ "message": "Dashboard created successfully!", "created_dashboard": dashboard.serialize() }), 201
 #endregion
 
 #region READ
@@ -97,14 +98,14 @@ def update_dashboard():
     if not dashboard:
         abort(404)
 
-    allowed_updates = ["dashboard_name"] # so much changes i know
-
-    for update in updates:
-        for key, value in update.items():
-            if key in allowed_updates:
-                setattr(dashboard, key, value)
+    allowed_updates = ["dashboard_name"] # so much options i know
     
     try:
+        for update in updates:
+            for key, value in update.items():
+                if key in allowed_updates:
+                    setattr(dashboard, key, value)
+
         db.session.commit()
     except Exception as e:
         print(f"Error: {str(e)}")
