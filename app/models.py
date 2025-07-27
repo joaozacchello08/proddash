@@ -1,7 +1,7 @@
 from .extensions import db
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey, UniqueConstraint
-from passlib.hash import bcrypt
+from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
 class User(db.Model):
@@ -11,41 +11,41 @@ class User(db.Model):
     username:      Mapped[str]         = mapped_column(db.String(50), unique=True, nullable=False)
     email:         Mapped[str]         = mapped_column(db.String(100), unique=True, nullable=False)
     password_hash: Mapped[str]         = mapped_column(db.String(128), nullable=False)
-    first_name:    Mapped[str]         = mapped_column(db.String(30), nullable=True)
-    last_name:     Mapped[str]         = mapped_column(db.String(50), nullable=True)
-    is_admin:      Mapped[bool]        = mapped_column(db.Boolean, default=False)
+    firstName:     Mapped[str]         = mapped_column(db.String(30), nullable=True)
+    lastName:      Mapped[str]         = mapped_column(db.String(50), nullable=True)
+    isAdmin:       Mapped[bool]        = mapped_column(db.Boolean, default=False)
     
     # datetime.now().strftime("%A %H:%M %d/%m/%Y") <- better format
-    created_at:    Mapped[datetime]    = mapped_column(db.DateTime, default=lambda: datetime.now())
+    createdAt:     Mapped[datetime]    = mapped_column(db.DateTime, default=lambda: datetime.now())
                                                             #  server_default=db.func.now() also works
 
     # relationship to dashboard
     # `uselist=False` -> one-to-one relationship
     dashboard:     Mapped["Dashboard"] = relationship(back_populates="user", uselist=False)
 
-    def __init__(self, username: str, email: str, password: str, first_name: str = None, last_name: str = None, is_admin: bool = False) -> None:
+    def __init__(self, username: str, email: str, password: str, firstName: str = None, lastName: str = None, isAdmin: bool = False) -> None:
         super().__init__()
         
         self.username   = username
         self.email      = email
-        self.first_name = first_name
-        self.last_name  = last_name
-        self.is_admin   = is_admin
+        self.firstName = firstName
+        self.lastName  = lastName
+        self.isAdmin   = isAdmin
         self.set_password(password)
 
     def set_password(self, password: str):
-        self.password_hash = bcrypt.hash(password)
+        self.password_hash = generate_password_hash(password)
     
     def check_password(self, password: str) -> bool:
-        return bcrypt.verify(password, self.password_hash)
+        return check_password_hash(self.password_hash, password)
 
     def serialize(self) -> dict:
         return {
             "id":         self.id,
             "username":   self.username,
-            "firstName":  self.first_name,
-            "lastName":   self.last_name,
-            "createdAt":  self.created_at.isoformat() if self.created_at else None,
+            "firstName":  self.firstName,
+            "lastName":   self.lastName,
+            "createdAt":  self.createdAt.isoformat() if self.createdAt else None,
             "dashboard":  self.dashboard.serialize()
         }
     
@@ -56,10 +56,10 @@ class Dashboard(db.Model):
     __tablename__ = "dashboards"
 
     id:             Mapped[int]             = mapped_column(db.Integer, primary_key=True)
-    user_id:        Mapped[int]             = mapped_column(db.Integer, db.ForeignKey("users.id"), unique=True, nullable=False)
-    dashboard_name: Mapped[str]             = mapped_column(db.String(30), unique=False, nullable=False)
+    userId:         Mapped[int]             = mapped_column(db.Integer, db.ForeignKey("users.id"), unique=True, nullable=False)
+    dashboardName:  Mapped[str]             = mapped_column(db.String(30), unique=False, nullable=False)
 
-    created_at:     Mapped[datetime]        = mapped_column(db.DateTime, default=lambda: datetime.now())
+    createdAt:      Mapped[datetime]        = mapped_column(db.DateTime, default=lambda: datetime.now())
 
     # relationships
     user:           Mapped["User"]          = relationship(back_populates="dashboard")
@@ -76,29 +76,29 @@ class Dashboard(db.Model):
     def serialize(self) -> dict:
         return {
             "id":            self.id,
-            "userId":        self.user_id,
-            "createdAt":     self.created_at.isoformat() if self.created_at else None,
-            "dashboardName": self.dashboard_name
+            "userId":        self.userId,
+            "createdAt":     self.createdAt.isoformat() if self.createdAt else None,
+            "dashboardName": self.dashboardName
         }
     
     def __repr__(self) -> str:
-        return f"<Dashboard(id={self.id}, name='{self.dashboard_name}')>"
+        return f"<Dashboard(id={self.id}, name='{self.dashboardName}')>"
 
 class Product(db.Model):
     __tablename__ = "products"
     
     id:              Mapped[int]           = mapped_column(db.Integer, primary_key=True)
-    dashboard_id:    Mapped[int]           = mapped_column(db.Integer, ForeignKey("dashboards.id"), nullable=False)
+    dashboardId:     Mapped[int]           = mapped_column(db.Integer, ForeignKey("dashboards.id"), nullable=False)
 
-    product_name:    Mapped[str]           = mapped_column(db.String(100), nullable=False)
-    product_image:   Mapped[str]           = mapped_column(db.Text, nullable=True)
+    productName:     Mapped[str]           = mapped_column(db.String(100), nullable=False)
+    productImage:    Mapped[str]           = mapped_column(db.Text, nullable=True)
 
-    product_price:   Mapped[float]         = mapped_column(db.Float, nullable=False)
-    product_cost:    Mapped[float]         = mapped_column(db.Float, nullable=True)
-    product_barcode: Mapped[str]           = mapped_column(db.String(14), nullable=True)
-    product_stock:   Mapped[int]           = mapped_column(db.Integer, default=0)
+    productPrice:    Mapped[float]         = mapped_column(db.Float, nullable=False)
+    productCost:     Mapped[float]         = mapped_column(db.Float, nullable=True)
+    productBarcode:  Mapped[str]           = mapped_column(db.String(14), nullable=True)
+    productStock:    Mapped[int]           = mapped_column(db.Integer, default=0)
 
-    created_at:      Mapped[datetime]      = mapped_column(db.DateTime, default=lambda: datetime.now())
+    createdAt:       Mapped[datetime]      = mapped_column(db.DateTime, default=lambda: datetime.now())
 
     # relationships
     dashboard:       Mapped["Dashboard"]   = relationship(back_populates="products")
@@ -106,8 +106,8 @@ class Product(db.Model):
 
     # table args - make product_name and product_barcode unique ONLY on the dashboard
     __table_args__ = (
-        UniqueConstraint("dashboard_id", "product_name", name="_dashboard_product_name_uc"),
-        UniqueConstraint("dashboard_id", "product_barcode", name="_dashboard_product_barcode_uc")
+        UniqueConstraint("dashboardId", "productName", name="_dashboard_product_name_uc"),
+        UniqueConstraint("dashboardId", "productBarcode", name="_dashboard_product_barcode_uc")
     )
 
 
@@ -124,33 +124,33 @@ class Product(db.Model):
     def serialize(self) -> dict:
         return {
             "productId":      self.id,
-            "dashboardId":    self.dashboard_id,
-            "productName":    self.product_name,
-            "productPrice":   self.product_price,
-            "productImage":   self.product_image,
-            "productBarcode": self.product_barcode,
-            "productStock":   self.product_stock,
-            "createdAt":      self.created_at.isoformat() if self.created_at else None,
-            "productCost": self.product_cost
+            "dashboardId":    self.dashboardId,
+            "productName":    self.productName,
+            "productPrice":   self.productPrice,
+            "productImage":   self.productImage,
+            "productBarcode": self.productBarcode,
+            "productStock":   self.productStock,
+            "createdAt":      self.createdAt.isoformat() if self.createdAt else None,
+            "productCost":    self.productCost
         }
 
     def __repr__(self) -> str:
-        return f"<Product(id={self.id}, product_name='{self.product_name}')>"
+        return f"<Product(id={self.id}, productName='{self.productName}')>"
 
 class Venda(db.Model):
     __tablename__ = "vendas"
 
-    id:            Mapped[int]         = mapped_column(db.Integer, primary_key=True)
-    product_id:    Mapped[int]         = mapped_column(db.Integer, ForeignKey("products.id"), nullable=False)
-    dashboard_id:  Mapped[int]         = mapped_column(db.Integer, ForeignKey("dashboards.id"), nullable=False)
-    sold_amount:   Mapped[int]         = mapped_column(db.Integer, default=1)
-    price_at_sale: Mapped[float]       = mapped_column(db.Float, nullable=False)
-    cost_at_sale:  Mapped[float]       = mapped_column(db.Float, nullable=True)
-    sold_at:       Mapped[datetime]    = mapped_column(db.DateTime, default=lambda: datetime.now())
+    id:          Mapped[int]         = mapped_column(db.Integer, primary_key=True)
+    productId:   Mapped[int]         = mapped_column(db.Integer, ForeignKey("products.id"), nullable=False)
+    dashboardId: Mapped[int]         = mapped_column(db.Integer, ForeignKey("dashboards.id"), nullable=False)
+    soldAmount:  Mapped[int]         = mapped_column(db.Integer, default=1)
+    priceAtSale: Mapped[float]       = mapped_column(db.Float, nullable=False)
+    costAtSale:  Mapped[float]       = mapped_column(db.Float, nullable=True)
+    soldAt:      Mapped[datetime]    = mapped_column(db.DateTime, default=lambda: datetime.now())
 
     # relationships
-    product:       Mapped["Product"]   = relationship(back_populates="sales")
-    dashboard:     Mapped["Dashboard"] = relationship(back_populates="sales")
+    product:     Mapped["Product"]   = relationship(back_populates="sales")
+    dashboard:   Mapped["Dashboard"] = relationship(back_populates="sales")
 
     # ...
     # def __init__(self, product_id: int, sold_amount: int = 1) -> None:
@@ -160,15 +160,15 @@ class Venda(db.Model):
     #     self.sold_amount = sold_amount
 
     def __repr__(self) -> str:
-        return f"<Venda(id={self.id}, product_id={self.product_id})>"
+        return f"<Venda(id={self.id}, productId={self.productId})>"
     
     def serialize(self) -> dict:
         return {
             "id": self.id,
-            "productId": self.product_id,
-            "dashboardId": self.dashboard_id,
-            "soldAmount": self.sold_amount,
-            "priceAtSale": self.price_at_sale,
-            "costAtSale": self.cost_at_sale,
-            "soldAt": self.sold_at.isoformat() if self.sold_at else None
+            "productId": self.productId,
+            "dashboardId": self.dashboardId,
+            "soldAmount": self.soldAmount,
+            "priceAtSale": self.priceAtSale,
+            "costAtSale": self.costAtSale,
+            "soldAt": self.soldAt.isoformat() if self.soldAt else None
         }

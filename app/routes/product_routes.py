@@ -1,10 +1,11 @@
 from flask import Blueprint, request, abort, jsonify
 from app.extensions import db
-from app.models import User, Dashboard, Product, Venda
-from sqlalchemy import or_#, func
+from app.models import Dashboard, Product
+
 
 product_bp = Blueprint("product_bp", __name__)
 
+#region products
 #region CREATE product
 @product_bp.route("/", methods=["POST"])
 def create_product():
@@ -29,16 +30,16 @@ def create_product():
         if not dashboard:
             abort(404)
         
-        if Product.query.filter_by(dashboard_id=dashboard_id, product_name=product_name).first() or Product.query.filter_by(dashboard_id=dashboard_id, product_barcode=product_barcode).first():
+        if Product.query.filter_by(dashboardId=dashboard_id, productName=product_name).first() or Product.query.filter_by(dashboardId=dashboard_id, productBarcode=product_barcode).first():
             abort(409)
         
         new_product = Product(
-            product_name=product_name,
-            product_price=float(product_price),
-            product_stock=int(product_stock),
-            product_image=product_image,
-            product_barcode=product_barcode,
-            product_cost=float(product_cost) if product_cost is not None else None
+            productName=product_name,
+            productPrice=float(product_price),
+            productStock=int(product_stock),
+            productImage=product_image,
+            productBarcode=product_barcode,
+            productCost=float(product_cost) if product_cost is not None else None
         )
 
         new_product.dashboard = dashboard
@@ -52,67 +53,55 @@ def create_product():
     return jsonify({ "message": "Product created successfully!", "newProduct": new_product.serialize() }), 201
 #endregion
 
-#region vendas
-## register
-@product_bp.route("/sales", methods=["POST"])
-def register_sale():
+#region UPDATE product
+@product_bp.route("/", methods=["UPDATE"])
+def update_product():
     body = request.json
 
     if not body:
         abort(400)
-
+    
     product_id = body.get("productId")
-    sold_amount = body.get("soldAmount")
-    price_at_sale = body.get("priceAtSale")
+    updates = body.get("updates")
 
-    if not product_id:
+    if not all([product_id, updates]):
         abort(400)
+
+    allowed_updates = ["productName", "productImage", "productPrice", "productCost", "productBarcode", "productStock"]
 
     try:
         product = db.session.get(Product, product_id)
         if not product:
             abort(404)
 
-        if sold_amount > product.product_stock:
-            abort(400)
-
-        _price_at_sale = price_at_sale if price_at_sale else product.price_at_sale
-        cost_at_sale = product.cost_at_sale
-
-        new_sale = Venda(
-            product_id=product_id,
-            dashboard_id=product.dashboard_id,
-            sold_amount=int(sold_amount),
-            price_at_sale=float(_price_at_sale),
-            cost_at_sale=float(cost_at_sale)
-        )
-
-        product.product_stock -= int(sold_amount)
-
-        db.session.add(new_sale)
+        for update in updates:
+            for key, value in update.items():
+                if key in allowed_updates:
+                    setattr(product, key, value)
+        
         db.session.commit()
     except Exception as e:
         print(f"Error: {str(e)}")
         abort(500)
     
-    return jsonify({ "message": "Sale registered successfully!", "newSale": new_sale.serialize() }), 201
+    return jsonify({ "updatedProduct": product.serialize() }), 200
+#endregion
 
-## load sale
-@product_bp.route("/sales/<int:venda_id>", methods=["GET"])
-def get_venda(venda_id: int):
-    venda = db.session.get(Venda, venda_id)
-    if not venda:
-        abort(404)
-    return jsonify({ "sale": venda.serialize() }), 200
-
-## load sales from a dashboard
-@product_bp.route("/sales/dashboard/<int:dashboard_id>", methods=["GET"])
-def get_vendas(dashboard_id: int):
-    dashboard = db.session.get(Dashboard, dashboard_id)
-    if not dashboard:
-        abort(404)
-
-    return jsonify({ "sales": [sale.serialize() for sale in dashboard.sales] }), 200
+#region DELETE product
+@product_bp.route("/<int:product_id>", methods=["DELETE"])
+def delete_product(product_id: int):
+    try:
+        product = db.session.get(Product, product_id)
+        if not product:
+            abort(404)
+        db.session.delete(product)
+        db.session.commit()
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        abort(500)
+    
+    return jsonify({ "deletedProduct": product.serialzie(), "message": "Product deleted successfully!" }), 200
+#endregion
 #endregion
 
 #region READ

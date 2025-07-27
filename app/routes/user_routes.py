@@ -2,6 +2,7 @@ from flask import Blueprint, request, abort, jsonify
 from app.extensions import db
 from app.models import User, Dashboard
 from sqlalchemy import or_, func
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 
 user_bp = Blueprint("user_bp", __name__)
 
@@ -19,7 +20,7 @@ def create_user():
     first_name = body.get("firstName")
     last_name = body.get("lastName")
 
-    if not all([email, username, password]):
+    if not all([username, password]):
         abort(400)
 
     if User.query.filter(or_(User.username == username, User.email == email)).first():
@@ -50,98 +51,30 @@ def create_user():
     return jsonify({ "message": "User created successfully!", "createdUser": new_user.serialize() }), 201
 #endregion
 
-#region READ
-@user_bp.route("/<int:user_id>", methods=["GET"])
-def get_user(user_id: int):
-    user = db.session.get(User, user_id)
-    if not user:
-        abort(404)
-    return jsonify({ "user": user.serialize() }), 200
-
-@user_bp.route("/random", methods=["GET"])
-def get_random_user():
-    random_user = User.query.order_by(func.random()).first()
-    
-    if not random_user:
-        abort(404)
-
-    return jsonify({ "random_user": random_user.serialize() }), 200
-
-@user_bp.route("/by-username/<string:username>", methods=["GET"])
-def get_user_by_username(username: str):
-    user = User.query.filter_by(username=username).first()
-    if not user:
-        abort(404)
-    return jsonify({ "user": user.serialize() }), 200
-#endregion
-
-#region UPDATE
-@user_bp.route("/", methods=["UPDATE"])
-def update_user():
+#region login user
+@user_bp.route("/login", methods=["POST"])
+def login():
     body = request.json
 
     if not body:
         abort(400)
 
-    # email = body.get("email")
-    username = body.get("username")
+    identifier = body.get("identifier")
     password = body.get("password")
-    updates = body.get("updates")
 
-    if not all([username, password]):
+    if not all([identifier, password]):
         abort(400)
 
-    user = db.session.query(User).filter_by(username=username).first()
+    user = User.query.filter(or_(User.username == identifier, User.email == identifier)).first()
 
     if not user:
         abort(404)
 
     if user.check_password(password) is False:
         abort(403)
-    
-    allowed_updates = ["first_name", "last_name"]
-    
-    try:
-        for update in updates:
-            for key, value in update.items():
-                if key in allowed_updates:
-                    setattr(user, key, value)
 
-        db.session.commit()
-    except Exception as e:
-        print(f"Error: {str(e)}")
-        abort(500)
+    access_token = create_access_token(identity=user.id)
 
-    return jsonify({ "message": "User updated successfully!", "updated_user": user.serialize() }), 200
-#endregion
+    return jsonify(access_token=access_token)
 
-#region DELETE
-@user_bp.route("/", methods=["DELETE"])
-def delete_user():
-    body = request.json
-
-    if not body:
-        abort(400)
-
-    username = body.get("email")
-    password = body.get("password")
-
-    if not all([username, password]):
-        abort(400)
-
-    user = User.query.filter_by(username=username).first()
-    if not user:
-        abort(404)
-
-    if user.check_password(password) is False:
-        abort(403)
-
-    try:
-        db.session.delete(user)
-        db.session.commit()
-    except Exception as e:
-        print(f"Error: {str(e)}")
-        abort(500)
-
-    return jsonify({ "message": "User deleted successfully.", "deleted_user": user.serialize() }), 200
 #endregion

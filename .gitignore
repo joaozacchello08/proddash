@@ -1,3 +1,6 @@
 venv
 __pycache__
 test
+.env
+GEMINI.md
+improvements.md
