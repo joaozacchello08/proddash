@@ -3,6 +3,16 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey, UniqueConstraint
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+from sqlalchemy.dialects.postgresql import UUID
+import uuid
+
+class TokenBlocklist(db.Model):
+    id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    jti: Mapped[str] = mapped_column(db.String(36), nullable=False, index=True)
+    createdAt: Mapped[datetime] = mapped_column(db.DateTime, nullable=False, default=lambda: datetime.now())
+
+    def __repr__(self) -> str:
+        return f"<Token {self.jti}>"
 
 class User(db.Model):
     __tablename__ = "users"
@@ -66,13 +76,6 @@ class Dashboard(db.Model):
     products:       Mapped[list["Product"]] = relationship(back_populates="dashboard")
     sales:          Mapped[list["Venda"]]   = relationship(back_populates="dashboard")
 
-    # everything already mapped and will be assigned manually, so __init__ method is kinda useless
-    # def __init__(self, user_id: str, dashboard_name: str) -> None:
-    #     super().__init__()
-
-    #     self.user_id        = user_id
-    #     self.dashboard_name = dashboard_name
-
     def serialize(self) -> dict:
         return {
             "id":            self.id,
@@ -110,17 +113,6 @@ class Product(db.Model):
         UniqueConstraint("dashboardId", "productBarcode", name="_dashboard_product_barcode_uc")
     )
 
-
-    # ...
-    # def __init__(self, product_name: str, product_stock: int, product_price: float, product_image: str = None, product_barcode: str = None) -> None:
-    #     super().__init__()
-        
-    #     self.product_name    = product_name
-    #     self.product_stock   = product_stock
-    #     self.product_price   = product_price
-    #     self.product_image   = product_image
-    #     self.product_barcode = product_barcode
-
     def serialize(self) -> dict:
         return {
             "productId":      self.id,
@@ -151,13 +143,6 @@ class Venda(db.Model):
     # relationships
     product:     Mapped["Product"]   = relationship(back_populates="sales")
     dashboard:   Mapped["Dashboard"] = relationship(back_populates="sales")
-
-    # ...
-    # def __init__(self, product_id: int, sold_amount: int = 1) -> None:
-    #     super().__init__()
-
-    #     self.product_id = product_id
-    #     self.sold_amount = sold_amount
 
     def __repr__(self) -> str:
         return f"<Venda(id={self.id}, productId={self.productId})>"
