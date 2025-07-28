@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from app.extensions import db
 from app.models import User, Product, Venda
-from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
+from flask_jwt_extended import get_jwt_identity, jwt_required
 
 sales_bp = Blueprint("sales_bp", __name__)
 
@@ -65,7 +65,7 @@ def get_venda(venda_id: int):
         return jsonify({ "message": "Sale not found" }), 404
     return jsonify({ "sale": venda.serialize() }), 200
 
-@sales_bp.route("/", method=["GET"])
+@sales_bp.route("/", methods=["GET"])
 @jwt_required()
 def get_vendas():
     current_user_id = get_jwt_identity()
