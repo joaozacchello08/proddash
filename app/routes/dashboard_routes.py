@@ -1,150 +1,115 @@
-from flask import Blueprint, request, abort, jsonify
+from flask import Blueprint, request, jsonify
 from app.extensions import db
-from app.models import Dashboard, User
-# from sqlalchemy import or_, func
+from app.models import User, Dashboard
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 dashboard_bp = Blueprint("dashboard_bp", __name__)
 
-#region CREATE
-# @dashboard_bp.route("/", methods=["POST"])
-# def create_dashboard():
-#     pass
-#     body = request.json
-
-#     if not body:
-#         abort(400)
-
-#     username = body.get("username")
-#     password = body.get("password")
-#     dashboard_name = body.get("dashboard_name")
-
-#     if not all([username, dashboard_name, password]):
-#         abort(400)
-
-#     user = User.query.filter_by(username=username).first()
-#     if not user:
-#         abort(404)
-
-#     if user.check_password(password) is False:
-#         abort(403)
-
-#     dashboard = Dashboard(user_id=user.id, dashboard_name=dashboard_name)
+#region create new dashboard
+@dashboard_bp.route("/", methods=["POST"])
+@jwt_required()
+def create_dashboard():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    if not user:
+        return jsonify({ "message": "User not found" }), 404
     
-#     if Dashboard.query.filter_by(user_id=user.id).first():
-#         abort(409)
+    if user.dashboard:
+        return jsonify({ "message": "User already have a dashboard." }), 409
     
-#     try:
-#         db.session.add(dashboard)
-#         db.session.commit()
-#     except Exception as e:
-#         print(f"Error: {str(e)}")
-#         abort(500)
+    body = request.json
+    if not body:
+        return jsonify({ "message": "No JSON found on request." }), 404
 
-#     return jsonify({ "message": "Dashboard created successfully!", "created_dashboard": dashboard.serialize() }), 201
+    dashboardName = body.get("dashboardName", f"New {user.username}'s Dashboard")
+
+    try:
+        new_dashboard = Dashboard(
+            userId=user.id,
+            dashboardName=dashboardName
+        )
+
+        user.dashboard = new_dashboard
+
+        db.session.add(new_dashboard)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error: {str(e)}")
+        return jsonify({ "message": "Error creating new dashboard." }), 500
+    
+    return jsonify({ "message": "Dashboard created successfully!", "createdDashboard": new_dashboard.serialize() }), 201
 #endregion
 
-#region READ
+#region read dashboard
 @dashboard_bp.route("/<int:dashboard_id>", methods=["GET"])
 def get_dashboard(dashboard_id: int):
-    dashboard = Dashboard.query.filter_by(id=dashboard_id).first()
+    dashboard = Dashboard.query.get(dashboard_id)
     if not dashboard:
-        abort(404)
+        return jsonify({ "message": "Dashboard not found." }), 404
     return jsonify({ "dashboard": dashboard.serialize() }), 200
 
-@dashboard_bp.route("/by-user-id/<int:user_id>", methods=["GET"])
-def get_dashboard_by_user_id(user_id: int):
-    dashboard = Dashboard.query.filter_by(user_id=user_id).first()
-    if not dashboard:
-        abort(404)
-    return jsonify({ "dashboard": dashboard.serialize() }), 200
-
-@dashboard_bp.route("/by-username/<string:username>", methods=["GET"])
-def get_dashboard_by_username(username: str):
-    user = User.query.filter_by(username=username).first()
-    
+@dashboard_bp.route("/", methods=["GET"])
+@jwt_required()
+def get_dashboard_from_user():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
     if not user:
-        abort(404)
-
-    dashboard = Dashboard.query.filter_by(user_id=user.id).first()
+        return jsonify({ "message": "User not found." }), 404
+    dashboard = user.dashboard
     if not dashboard:
-        abort(404)
-
+        return jsonify({ "message": "Didn't found a dashboard for this user." }), 404
+    
     return jsonify({ "dashboard": dashboard.serialize() }), 200
 #endregion
 
-#region UPDATE
-@dashboard_bp.route("/", methods=["UPDATE"])
+#region update dashboard
+@dashboard_bp.route("/", methods=["PUT"])
+@jwt_required()
 def update_dashboard():
-    body = request.json
-
-    if not body:
-        abort(400)
-
-    username = body.get("username")
-    password = body.get("password")
-    updates = body.get("updates")
-
-    if not all([username, updates, password]):
-        abort(400)
-
-    user = User.query.filter_by(username=username).first()
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
     if not user:
-        abort(404)
+        return jsonify({ "message": "User not found." }), 404
     
-    if user.check_password(password) is False:
-        abort(403)
-
-    dashboard = Dashboard.query.filter_by(username=username).first()
+    dashboard = user.dashboard
     if not dashboard:
-        abort(404)
-
-    allowed_updates = ["dashboard_name"] # so much options i know
+        return jsonify({ "message": "Couldn't find a dashboard for this user." }), 404
     
-    try:
-        for update in updates:
-            for key, value in update.items():
-                if key in allowed_updates:
-                    setattr(dashboard, key, value)
+    body = request.json
+    if not body:
+        return jsonify({ "message": "No JSON found on the request." }), 400
+    
+    dashboard.dashboardName = body.get("dashboardName", dashboard.dashboardName)
 
+    try:
         db.session.commit()
     except Exception as e:
         print(f"Error: {str(e)}")
-        abort(500)
-    
-    return jsonify({ "updated_dashboard": dashboard.serialize() }), 200
+
+    return jsonify({ "message": "Dashboard updated successfully!" }), 200
 #endregion
 
-#region DELETE
+#region delete dashboard
 @dashboard_bp.route("/", methods=["DELETE"])
+@jwt_required()
 def delete_dashboard():
-    body = request.json
-
-    if not body:
-        abort(400)
-
-    username = body.get("username")
-    password = body.get("password")
-
-    if not all([username, password]):
-        abort(400)
-
-    user = User.query.filter_by(username=username).first()
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
     if not user:
-        abort(404)
-
-    if user.check_password(password) is False:
-        abort(403)
+        return jsonify({ "message": "User not found" }), 404
     
-    dashboard = Dashboard.query.filter_by(user_id=user.id).first()
+    dashboard = user.dashboard
     if not dashboard:
-        abort(404)
-
+        return jsonify({ "message": "Couldn't find dashboard for this user." }), 404
+    
     try:
         db.session.delete(dashboard)
         db.session.commit()
     except Exception as e:
+        db.session.rollback()
         print(f"Error: {str(e)}")
-        abort(500)
+        return jsonify({ "message": "Error updating dashboard." }), 500
     
-    return jsonify({ "deleted_dashboard": dashboard.serialize() }), 200
+    return jsonify({ "message": "Dashboard updated successfully!" }), 200
 #endregion
