@@ -25,7 +25,7 @@ def create_dashboard():
 
     try:
         new_dashboard = Dashboard(
-            userId=user.id,
+            userId=None,
             dashboardName=dashboardName
         )
 

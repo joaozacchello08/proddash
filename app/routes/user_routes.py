@@ -4,13 +4,6 @@ from app.models import User, Dashboard, TokenBlocklist
 from sqlalchemy import or_
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
 from dateutil import relativedelta
-# from dotenv import load_dotenv, dotenv_values
-# from os import getenv
-
-# load_dotenv()
-# config = dotenv_values()
-
-# SECRET_KEY = config["SECRET_KEY"] | getenv("SECRET_KEY")
 
 user_bp = Blueprint("user_bp", __name__)
 
@@ -25,10 +18,10 @@ def create_user():
     email = body.get("email").replace(" ", "")
     username = body.get("username").replace(" ", "")
     password = body.get("password")
-    first_name = body.get("firstName")
-    last_name = body.get("lastName")
+    firstName = body.get("firstName")
+    lastName = body.get("lastName")
 
-    if not all([username, password]):
+    if not all([email, username, password]):
         jsonify({ "message": "Missing required credentials." }), 400
 
     if User.query.filter(or_(User.username == username, User.email == email)).first():
@@ -36,11 +29,11 @@ def create_user():
 
     try:
         new_user = User(
-            username=username,
             email=email,
+            username=username,
             password=password,
-            first_name=first_name,
-            last_name=last_name
+            firstName=firstName,
+            lastName=lastName
         )
 
         new_dashboard = Dashboard(
@@ -59,7 +52,7 @@ def create_user():
     
     access_token = create_access_token(
         identity=new_user.id,
-        expires_delta=relativedelta(months=1)
+        expires_delta=relativedelta(months=3)
     )
 
     return jsonify({
@@ -93,7 +86,7 @@ def login():
 
     access_token = create_access_token(
         identity=user.id,
-        expires_delta=relativedelta(months=1)
+        expires_delta=relativedelta(months=3)
     )
 
     return jsonify({ "accessToken": access_token }), 200

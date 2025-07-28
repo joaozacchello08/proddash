@@ -123,7 +123,7 @@ def update_sale(sale_id: int):
 #region delete sale
 @sales_bp.route("/<int:sale_id>", methods=["DELETE"])
 @jwt_required()
-def delete_user(sale_id: int):
+def delete_sale(sale_id: int):
     current_user_id = get_jwt_identity()
     user = User.query.get(current_user_id)
     if not user:

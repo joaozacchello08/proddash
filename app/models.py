@@ -55,8 +55,8 @@ class User(db.Model):
         return {
             "id":         self.id,
             "username":   self.username,
-            "firstName":  self.firstName,
-            "lastName":   self.lastName,
+            "firstName":  self.firstName if self.firstName else None,
+            "lastName":   self.lastName if self.lastName else None,
             "createdAt":  self.createdAt.isoformat() if self.createdAt else None,
             "dashboard":  self.dashboard.serialize()
         }
