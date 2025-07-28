@@ -7,6 +7,8 @@ from sqlalchemy.dialects.postgresql import UUID
 import uuid
 
 class TokenBlocklist(db.Model):
+    __tablename__ = "revoked_tokens"
+
     id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     jti: Mapped[str] = mapped_column(db.String(36), nullable=False, index=True)
     createdAt: Mapped[datetime] = mapped_column(db.DateTime, nullable=False, default=lambda: datetime.now())
