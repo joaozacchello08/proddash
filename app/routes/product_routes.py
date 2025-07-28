@@ -78,7 +78,7 @@ def get_products():
         print(f"Error: {str(e)}")
         return jsonify({ "message": "Error retrieving all dashboard products" }), 500
     
-@product_bp.route("/<int:product_id", methods=["GET"])
+@product_bp.route("/<int:product_id>", methods=["GET"])
 @jwt_required()
 def get_product(product_id: int):
     product = Product.query.get(product_id)
