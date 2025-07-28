@@ -22,7 +22,8 @@ def create_user():
     lastName = body.get("lastName")
 
     if not all([email, username, password]):
-        jsonify({ "message": "Missing required credentials." }), 400
+        print("Missing required credentials.")
+        return jsonify({ "message": "Missing required credentials." }), 400
 
     if User.query.filter(or_(User.username == username, User.email == email)).first():
         return jsonify({ "message": "User already exists" }), 409
@@ -37,8 +38,8 @@ def create_user():
         )
 
         new_dashboard = Dashboard(
-            user_id=None, # will be set automatically by the relationship
-            dashboard_name=f"{username}'s Dashboard"
+            userId=None, # will be set automatically by the relationship
+            dashboardName=f"{username}'s Dashboard"
         )
 
         new_user.dashboard = new_dashboard # establishing the relationship
@@ -52,7 +53,7 @@ def create_user():
     
     access_token = create_access_token(
         identity=new_user.id,
-        expires_delta=relativedelta(months=3)
+        # expires_delta=relativedelta(months=3)
     )
 
     return jsonify({
@@ -74,7 +75,7 @@ def login():
     password = body.get("password")
 
     if not all([identifier, password]):
-        jsonify({ "message": "Missing required credentials." }), 400
+        return jsonify({ "message": "Missing required credentials." }), 400
 
     user = User.query.filter(or_(User.username == identifier, User.email == identifier)).first()
 
@@ -86,7 +87,7 @@ def login():
 
     access_token = create_access_token(
         identity=user.id,
-        expires_delta=relativedelta(months=3)
+        # expires_delta=relativedelta(months=3)
     )
 
     return jsonify({ "accessToken": access_token }), 200

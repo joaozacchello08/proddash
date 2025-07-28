@@ -49,7 +49,7 @@ if __name__ == "__main__":
         print("Dashboard updated:", dashboard_data)
 
         # Create three products
-        product1 = create_product(access_token, "Product 1", 10.99)
+        product1 = create_product(access_token, "Product 1", "10.99")
         print("Product 1 created:", product1)
         product2 = create_product(access_token, "Product 2", 20.49)
         print("Product 2 created:", product2)
