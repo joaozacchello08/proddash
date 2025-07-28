@@ -68,5 +68,39 @@ def get_products():
     if not user:
         return jsonify({ "message": "User not found" }), 404
     
+    dashboard = user.dashboard
+    if not dashboard:
+        return jsonify({ "message": "Couldn't find dashboard for this user" }), 404
+
+    try:
+        return jsonify({ "products": [product.serialize() for product in dashboard.products] }), 200
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return jsonify({ "message": "Error retrieving all dashboard products" }), 500
     
+@product_bp.route("/<int:product_id", methods=["GET"])
+def get_product(product_id: int):
+    product = Product.query.get(product_id)
+    if not product:
+        return jsonify({ "message": "Product not found" }), 404
+    return jsonify({ "product": product.serialize() }), 200
+#endregion
+
+#region delete
+@product_bp.route("/<int:product_id>", methods=["DELETE"])
+@jwt_required()
+def delete_product(product_id: int):
+    product = Product.query.get(product_id)
+    if not product:
+        return jsonify({ "message": "Product not found" }), 404
+    
+    try:
+        db.session.delete(product)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error: {str(e)}")
+        return jsonify({ "message": "Error deleting product" }), 500
+    
+    return jsonify({ "message": "Product deleted successfully!" }), 200
 #endregion
