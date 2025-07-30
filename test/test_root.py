@@ -7,7 +7,9 @@ load_dotenv()
 
 API_KEY = getenv("SECRET_KEY")
 
-response = requests.get(url="http://127.0.0.1:8000/",
+BASE_URL = ["https://proddash.onrender.com/", "http://127.0.0.1:8000/api"]
+
+response = requests.get(url=BASE_URL[0],
                         headers={"X-API-KEY": API_KEY})
 
 file_path = "./test/root.html"
