@@ -33,11 +33,11 @@ def create_app():
         if request.remote_addr not in allowed_ips:
             return jsonify({ "message": "Unauthorized IP" }), 403
         
-        if not request.is_secure and app.env == "production":
-            return jsonify({ "message": "Only HTTPS are accepted." }), 403
+        # if not request.is_secure and app.env == "production":
+        #     return jsonify({ "message": "Only HTTPS are accepted." }), 403
         
         api_key = request.headers.get("X-API-KEY")
-        if api_key != app.config["API_SECRET_KEY"]:
+        if api_key != app.config["SECRET_KEY"]:
             return jsonify({ "message": "API key invalid." }), 401 
 
     @jwt.token_in_blocklist_loader
