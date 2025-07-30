@@ -10,7 +10,7 @@ dashboard_bp = Blueprint("dashboard_bp", __name__)
 @jwt_required()
 def create_dashboard():
     current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
+    user = User.query.get(int(current_user_id))
     if not user:
         return jsonify({ "message": "User not found" }), 404
     
@@ -43,6 +43,7 @@ def create_dashboard():
 
 #region read dashboard
 @dashboard_bp.route("/<int:dashboard_id>", methods=["GET"])
+@jwt_required()
 def get_dashboard(dashboard_id: int):
     dashboard = Dashboard.query.get(dashboard_id)
     if not dashboard:
@@ -68,7 +69,7 @@ def get_dashboard_from_user():
 @jwt_required()
 def update_dashboard():
     current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
+    user = User.query.get(int(current_user_id))
     if not user:
         return jsonify({ "message": "User not found." }), 404
     
@@ -86,6 +87,8 @@ def update_dashboard():
         db.session.commit()
     except Exception as e:
         print(f"Error: {str(e)}")
+        db.session.rollback()
+        return jsonify({ "error": "Internal server error updating dashboard." }), 500
 
     return jsonify({ "message": "Dashboard updated successfully!" }), 200
 #endregion
@@ -95,7 +98,7 @@ def update_dashboard():
 @jwt_required()
 def delete_dashboard():
     current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
+    user = User.query.get(int(current_user_id))
     if not user:
         return jsonify({ "message": "User not found" }), 404
     

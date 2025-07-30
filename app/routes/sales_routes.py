@@ -11,7 +11,7 @@ sales_bp = Blueprint("sales_bp", __name__)
 @jwt_required()
 def register_sale(product_id: int):
     current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
+    user = User.query.get(int(current_user_id))
     if not user:
         return jsonify({ "message": "User not found." }, 404)
 
@@ -19,28 +19,27 @@ def register_sale(product_id: int):
     if not body:
         return jsonify({ "message": "No JSON found on request." }), 400
 
-    sold_amount = body.get("soldAmount")
-    price_at_sale = body.get("priceAtSale")
-
-    if not sold_amount:
-        return jsonify({ "message": "soldAmount is required." }), 400
-
     try:
         product = Product.query.filter_by(id=product_id, dashboardId=user.dashboard.id).first()
         if not product:
             return jsonify({ "message": "Product not found on this dashboard" }), 404
 
+        sold_amount = body.get("soldAmount")
+        price_at_sale = body.get("priceAtSale", product.productPrice)
+
+        if not sold_amount:
+            return jsonify({ "message": "soldAmount is required." }), 400
+
         if sold_amount > product.productStock:
             return jsonify({ "message": "Sold amount is more than actual stock." }), 400
 
-        _price_at_sale = price_at_sale if price_at_sale else product.priceAtSale
-        cost_at_sale = product.costAtSale
+        cost_at_sale = product.productCost
 
         new_sale = Venda(
             productId=product_id,
             dashboardId=product.dashboardId,
             soldAmount=int(sold_amount),
-            priceAtSale=float(_price_at_sale),
+            priceAtSale=float(price_at_sale),
             costAtSale=float(cost_at_sale)
         )
 
@@ -51,7 +50,7 @@ def register_sale(product_id: int):
     except Exception as e:
         print(f"Error: {str(e)}")
         db.session.rollback()
-        return jsonify({ "message": "Error trying to register sale." }), 500
+        return jsonify({ "error": "Error trying to register sale." }), 500
     
     return jsonify({ "message": "Sale registered successfully!", "newSale": new_sale.serialize() }), 201
 #endregion
@@ -69,7 +68,7 @@ def get_venda(venda_id: int):
 @jwt_required()
 def get_vendas():
     current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
+    user = User.query.get(int(current_user_id))
     if not user:
         return jsonify({ "message": "User not found." }), 404
     
@@ -87,7 +86,7 @@ def get_vendas():
 @jwt_required()
 def update_sale(sale_id: int):
     current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
+    user = User.query.get(int(current_user_id))
     if not user:
         return jsonify({ "message": "User not found." }), 404
     
@@ -125,7 +124,7 @@ def update_sale(sale_id: int):
 @jwt_required()
 def delete_sale(sale_id: int):
     current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
+    user = User.query.get(int(current_user_id))
     if not user:
         return jsonify({ "message": "User not found." }), 404
 

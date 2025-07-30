@@ -1,57 +1,72 @@
-# this is case 1, this case shows a user registering an account, changing his dashboard to 'shop stock' and creating three products
+# In this case, user will create an account and will be automatically logged in, then, will change his dashboard name to "shop stock", then, will create a product and will register a sale of this product
+
+from faker import Faker
 import requests
-import json
+# from json import dumps
 
-BASE_URL = "http://localhost:8080"
+BASE_URL = "http://localhost:8080/api"
 
-def register_user(username, email, password):
-    url = f"{BASE_URL}/api/users/"
-    data = {
-        "username": username,
-        "email": email,
-        "password": password
-    }
-    response = requests.post(url, json=data)
-    return response.json()
+fake = Faker("pt_BR")
 
-def change_dashboard_name(token, new_name):
-    url = f"{BASE_URL}/api/dashboards/"
-    headers = {
-        "Authorization": f"Bearer {token}"
-    }
-    data = {
-        "dashboardName": new_name
-    }
-    response = requests.put(url, headers=headers, json=data)
-    return response.json()
+firstName = fake.first_name()
+lastName  = fake.last_name()
 
-def create_product(token, name, price):
-    url = f"{BASE_URL}/api/products/"
-    headers = {
-        "Authorization": f"Bearer {token}"
-    }
-    data = {
-        "productName": name,
-        "productPrice": price
-    }
-    response = requests.post(url, headers=headers, json=data)
-    return response.json()
+user_data = {
+    "email": f"{firstName.lower()}.{lastName.lower()}@{fake.domain_name()}",
+    "username": f"{firstName.lower()}_{lastName.lower().replace(" ", "_")}",
+    "password": f"{fake.password(length=20)}",
+    "firstName": firstName,
+    "lastName": lastName
+}
 
-if __name__ == "__main__":
-    # Register a new user
-    user_data = register_user("testuser1", "test1@example.com", "password123")
-    print("User registered:", user_data)
-    access_token = user_data.get("accessToken")
+#region functions
+def create_user():
+    response = requests.post(url=f"{BASE_URL}/users/",
+                             json=user_data)
+    
+    return [response.status_code, response.json()]
 
-    if access_token:
-        # Change dashboard name
-        dashboard_data = change_dashboard_name(access_token, "shop stock")
-        print("Dashboard updated:", dashboard_data)
+def update_dashboard(accessToken: str, dashboardName: str):
+    response = requests.put(url=f"{BASE_URL}/dashboards/",
+                            headers={"Authorization": f"Bearer {accessToken}"},
+                            json={"dashboardName":dashboardName})
+    
+    return [response.status_code, response.json()]
 
-        # Create three products
-        product1 = create_product(access_token, "Product 1", "10.99")
-        print("Product 1 created:", product1)
-        product2 = create_product(access_token, "Product 2", 20.49)
-        print("Product 2 created:", product2)
-        product3 = create_product(access_token, "Product 3", 5.99)
-        print("Product 3 created:", product3)
+def create_product(accessToken: str, name: str, price: float, cost: float, stock: int):
+    response = requests.post(url=f"{BASE_URL}/products/",
+                             headers={"Authorization": f"Bearer {accessToken}"},
+                             json={
+                                 "productName": name,
+                                 "productPrice": price,
+                                 "productCost": cost,
+                                 "productStock": stock
+                             })
+    
+    return [response.status_code, response.json()]
+
+def register_sale(accessToken: str, productId: int, soldAmount: int):
+    response = requests.post(url=f"{BASE_URL}/sales/{productId}",
+                             headers={"Authorization":f"Bearer {accessToken}"},
+                             json={"soldAmount":soldAmount})
+    
+    return [response.status_code, response.json()]
+#endregion
+
+created_user = create_user()
+if created_user[0] == 201:
+    accessToken = created_user[1]["accessToken"]
+
+    updated_dashboard = update_dashboard(accessToken, "shop stock")
+    created_product = create_product(accessToken, "Camiseta Corinthians Versão Torcedor I 25/26", 349.99, 10, 20)
+    registered_sale = register_sale(accessToken, created_product[1]["product"]["productId"], 2)
+
+    print(created_user[1]["message"])
+    print(updated_dashboard[1]["message"] if updated_dashboard[0] == 200 else updated_dashboard[1]["error"])
+    print(created_product[1]["message"] if created_product[0] == 201 else created_product[1]["error"])
+    print(registered_sale[1]["message"] if registered_sale[0] == 201 else registered_sale[1]["error"])
+else:
+    print(f"Error:\n{created_user[1]["error"]}")
+    raise SystemError("corre negadaaaaa")
+
+# done, this shit is working.

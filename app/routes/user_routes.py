@@ -3,7 +3,7 @@ from app.extensions import db
 from app.models import User, Dashboard, TokenBlocklist
 from sqlalchemy import or_
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
-from dateutil import relativedelta
+# from dateutil import relativedelta
 
 user_bp = Blueprint("user_bp", __name__)
 
@@ -15,8 +15,8 @@ def create_user():
     if not body:
         return jsonify({ "message": "No JSON found on request." }), 400
     
-    email = body.get("email").replace(" ", "")
-    username = body.get("username").replace(" ", "")
+    email = body.get("email")
+    username = body.get("username")
     password = body.get("password")
     firstName = body.get("firstName")
     lastName = body.get("lastName")
@@ -30,8 +30,8 @@ def create_user():
 
     try:
         new_user = User(
-            email=email,
-            username=username,
+            email=email.replace(" ", ""),
+            username=username.replace(" ", ""),
             password=password,
             firstName=firstName,
             lastName=lastName
@@ -52,7 +52,7 @@ def create_user():
         return jsonify({ "message": "Error creating user." }), 500
     
     access_token = create_access_token(
-        identity=new_user.id,
+        identity=str(new_user.id),
         # expires_delta=relativedelta(months=3)
     )
 
@@ -86,7 +86,7 @@ def login():
         return jsonify({ "message": "Unauthorized." }), 403
 
     access_token = create_access_token(
-        identity=user.id,
+        identity=str(user.id),
         # expires_delta=relativedelta(months=3)
     )
 
@@ -98,7 +98,7 @@ def login():
 @jwt_required()
 def update_user():
     current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
+    user = User.query.get(int(current_user_id))
 
     if not user:
         return jsonify({ "message": "User not found." }), 404
