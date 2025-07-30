@@ -1,0 +1,87 @@
+<script type="text/javascript">
+var gk_isXlsx = false;
+var gk_xlsxFileLookup = {};
+var gk_fileData = {};
+function filledCell(cell) {
+    return cell !== '' && cell != null;
+}
+function loadFileData(filename) {
+    if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+        try {
+            var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+            var firstSheetName = workbook.SheetNames[0];
+            var worksheet = workbook.Sheets[firstSheetName];
+
+            // Convert sheet to JSON to filter blank rows
+            var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+            // Filter out blank rows (rows where all cells are empty, null, or undefined)
+            var filteredData = jsonData.filter(row => row.some(filledCell));
+
+            // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+            var headerRowIndex = filteredData.findIndex((row, index) =>
+                row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+            );
+            // Fallback
+            if (headerRowIndex === -1 || headerRowIndex > 25) {
+                headerRowIndex = 0;
+            }
+
+            // Convert filtered JSON back to CSV
+            var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+            csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+            return csv;
+        } catch (e) {
+            console.error(e);
+            return "";
+        }
+    }
+    return gk_fileData[filename] || "";
+}
+</script>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Corinthians: 2012 Club World Cup Champions</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="bg-gray-100 font-sans">
+        <header class="bg-black text-white py-6">
+            <div class="container mx-auto text-center">
+                <h1 class="text-4xl font-bold">Corinthians: 2012 Club World Cup Champions</h1>
+            </div>
+        </header>
+
+        <main class="container mx-auto py-8 px-4">
+            <section class="bg-white rounded-lg shadow-lg p-6 mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">A Historic Victory</h2>
+                <p class="text-gray-600 mb-4">
+                    In 2012, Sport Club Corinthians Paulista achieved a monumental milestone by winning the FIFA Club World Cup, held in Japan. The Brazilian club, representing South America as the Copa Libertadores champions, defeated Chelsea FC 1-0 in the final on December 16, 2012, at the International Stadium in Yokohama.
+                </p>
+                <p class="text-gray-600">
+                    The sole goal was scored by Peruvian striker Paolo Guerrero in the 69th minute, heading in a precise cross from teammate Danilo. This victory marked Corinthians' second Club World Cup title, following their 2000 triumph, solidifying their status as a global football powerhouse.
+                </p>
+            </section>
+
+            <section class="bg-white rounded-lg shadow-lg p-6 mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">The Road to Glory</h2>
+                <ul class="list-disc list-inside text-gray-600 space-y-2">
+                    <li><strong>Semi-Final:</strong> Corinthians defeated Al-Ahly SC (Egypt) 1-0, with Guerrero scoring the decisive goal.</li>
+                    <li><strong>Final:</strong> A tactical masterclass led by coach Tite, with goalkeeper Cássio making crucial saves against Chelsea's star-studded lineup.</li>
+                    <li><strong>Key Players:</strong> Paolo Guerrero, Cássio, Danilo, and Emerson Sheik were instrumental in the campaign.</li>
+                </ul>
+            </section>
+
+            <section class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Legacy of 2012</h2>
+                <p class="text-gray-600 mb-6">
+                    The 2012 Club World Cup victory was a defining moment for Corinthians, celebrated by millions of fans, known as the "Fiel." The triumph showcased the club's resilience, tactical discipline, and passionate fanbase. To this day, it remains a proud chapter in Corinthians' storied history, symbolizing their ability to compete and win on the world stage.
+                </p>
+                <div class="flex justify-center">
+                    <img src="https://s2-ge.glbimg.com/CIo8zcEJ3fcICLy16tovSpupamo=/0x0:1920x1080/924x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_bc8228b6673f488aa253bbcb03c80ec5/internal_photos/bs/2019/B/1/0qcGOnSBmJNpKXj9muVw/ta-a-libertadores-corinthians-2012.jpg" alt="Corinthians 2012 Team Celebration" class="rounded-lg shadow-md max-w-full h-auto">
+                </div>
+            </section>
+        </main>
+    </body>
+</html>

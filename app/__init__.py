@@ -27,6 +27,12 @@ def create_app():
     CORS(app)
     register_routes(app)
 
+    @app.route("/", methods=["GET"])
+    def root():
+        with open("./assets/index.html", "r", encoding="utf-8") as f:
+            html = f.read()
+        return html
+
     @app.before_request
     def secure_requests():
         allowed_ips = app.config["ALLOWED_IPS"]
