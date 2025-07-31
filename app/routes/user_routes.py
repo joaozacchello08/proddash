@@ -127,6 +127,17 @@ def update_user():
     return jsonify({ "message": "User updated successfully!", "updatedUser": user.serialize() }), 200
 #endregion
 
+#region get user profile
+@user_bp.route("/", methods=["GET"])
+@jwt_required()
+def get_user():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(int(current_user_id))
+    if not user:
+        return jsonify({ "message": "User not found." }), 404
+    return jsonify({ "user": user.serialize() }), 200
+#endregion
+
 #region logout user
 @user_bp.route("/logout", methods=["POST"])
 @jwt_required()
