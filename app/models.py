@@ -23,8 +23,8 @@ class User(db.Model):
     username:      Mapped[str]         = mapped_column(db.String(50), unique=True, nullable=False)
     email:         Mapped[str]         = mapped_column(db.String(100), unique=True, nullable=False)
     password_hash: Mapped[str]         = mapped_column(db.String(256), nullable=False)
-    firstName:     Mapped[str]         = mapped_column(db.String(30), nullable=True)
-    lastName:      Mapped[str]         = mapped_column(db.String(50), nullable=True)
+    firstName:     Mapped[str]         = mapped_column(db.String(50), nullable=True)
+    lastName:      Mapped[str]         = mapped_column(db.String(70), nullable=True)
     isAdmin:       Mapped[bool]        = mapped_column(db.Boolean, default=False)
     
     # datetime.now().strftime("%A %H:%M %d/%m/%Y") <- better format
@@ -69,7 +69,7 @@ class Dashboard(db.Model):
 
     id:             Mapped[int]             = mapped_column(db.Integer, primary_key=True)
     userId:         Mapped[int]             = mapped_column(db.Integer, db.ForeignKey("users.id"), unique=True, nullable=False)
-    dashboardName:  Mapped[str]             = mapped_column(db.String(30), unique=False, nullable=False)
+    dashboardName:  Mapped[str]             = mapped_column(db.String(100), unique=False, nullable=False)
 
     createdAt:      Mapped[datetime]        = mapped_column(db.DateTime, default=lambda: datetime.now())
 
