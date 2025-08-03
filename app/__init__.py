@@ -34,14 +34,7 @@ def create_app():
         return html
 
     @app.before_request
-    def secure_requests():
-        allowed_ips = app.config["ALLOWED_IPS"]
-        if request.remote_addr not in allowed_ips:
-            return jsonify({ "message": "Unauthorized IP" }), 403
-        
-        # if not request.is_secure and app.env == "production":
-        #     return jsonify({ "message": "Only HTTPS are accepted." }), 403
-        
+    def secure_requests():        
         api_key = request.headers.get("X-API-KEY")
         if api_key != app.config["SECRET_KEY"]:
             return jsonify({ "message": "API key invalid." }), 401 
