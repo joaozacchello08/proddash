@@ -8,9 +8,9 @@ load_dotenv()
 
 API_KEY = getenv("SECRET_KEY")
 
-BASE_URL = ["https://proddash.onrender.com/", "http://127.0.0.1:8000/api"]
+BASE_URL = "http://localhost:8080/"
 
-response = requests.get(url=BASE_URL[0],
+response = requests.get(url=BASE_URL,
                         headers={"X-API-KEY": API_KEY})
 
 desktop_path = Path.home() / "Desktop"

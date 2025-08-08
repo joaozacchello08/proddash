@@ -9,18 +9,10 @@ def create_app():
     app = Flask(__name__) 
 
     flask_env = os.environ.get("FLASK_ENV", "development")
-    match(flask_env):
-        case "development":
-            app.config.from_object("config.DevelopmentConfig")
-        
-        case "dev_deploy":
-            app.config.from_object("config.DeployDevConfig")
-
-        case "production":
-            app.config.from_object("config.ProductionConfig")
-
-        case _:
-            app.config.from_object("config.DevelopmentConfig")
+    if flask_env == "production":
+        app.config.from_object("config.ProductionCfg")
+    else:
+        app.config.from_object("config.DevelopmentCfg")
 
     db.init_app(app)
     jwt.init_app(app)
