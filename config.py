@@ -4,7 +4,7 @@ from getpass import getuser
 
 load_dotenv()
 
-#region get user programdata path
+# get user programdata path
 import platform
 from pathlib import Path
 
@@ -23,7 +23,7 @@ def get_programdata_path(appname: str = None) -> Path:
 
 #endregion
 
-#region register or load our program data
+# register or load our program data
 app_path = get_programdata_path("ProdDash")
 cfg_file_path = app_path / "app.cfg"
 username = getuser()
@@ -34,9 +34,8 @@ if not cfg_file_path.exists():
     with open(cfg_file_path, "w") as file:
         file.write(f"user={username}\n")
         file.write(f"db_path=sqlite:///{(app_path / f'proddash_user_{username}.db')}\n")
-#endregion
 
-#region load user program data
+# load user program data
 def load_cfg_file(path: Path) -> dict:
     data = {}
     if path.exists():
