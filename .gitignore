@@ -3,3 +3,7 @@ __pycache__
 .env
 test/root.html
 /instance
+bun.lock
+package.json
+node_modules
+test
