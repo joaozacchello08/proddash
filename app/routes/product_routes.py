@@ -76,6 +76,17 @@ def get_product(product_id: int):
     product = Product.query.filter_by(dashboardId=user.dashboard.id, id=product_id).first()
     return jsonify({ "product": product.serialize() }), 200
 
+@product_bp.route("/by-barcode/<string:barcode>", methods=["GET"])
+@jwt_required()
+def get_product_by_barcode(barcode: str):
+    user_id = get_jwt_identity()
+    user = User.query.get(int(user_id))
+
+    if not user or not user.dashboard:
+        return jsonify({ "message": "User or dashboard not found." }), 404
+
+    product = Product.query.filter_by(dashboardId=user.dashboard.id, productBarcode=barcode).first()
+    return jsonify({ "product": product.serialize() }), 200
 #endregion
 
 #region update product
