@@ -1,8 +1,5 @@
 venv
 __pycache__
 .env
-test/root.html
-bun.lock
-package.json
 node_modules
 *.DS_Store
