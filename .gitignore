@@ -7,3 +7,4 @@ bun.lock
 package.json
 node_modules
 test
+*.DS_Store
