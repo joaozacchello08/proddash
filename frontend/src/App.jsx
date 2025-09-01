@@ -1,6 +1,6 @@
 import Product from "./components/product/Product"
 import image from "./assets/image.png"
-import { Link } from "react-router-dom"
+import Header from "./components/header/Header"
 
 const products = [
     {
@@ -57,16 +57,7 @@ const products = [
 export default function App() {
     return (
         <div>
-            <header className="header">
-                <div className="logo">ProdDash</div>
-                <nav className="nav-links">
-                    <Link to={"#"} className="nav-link">Dashboard</Link>
-                    <Link to={"#"} className="nav-link">Adicionar produto</Link>
-                    <Link to={"#"} className="nav-link">Vendas</Link>
-                    <Link to={"#"} className="nav-link">Lucro</Link>
-                    <Link to={"#"} className="nav-link">Usuário</Link>
-                </nav>
-            </header>
+            <Header />
 
             <h3 style={{ paddingLeft: 50 }}>A</h3>
             <div className="product-grid">
