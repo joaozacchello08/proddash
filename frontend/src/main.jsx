@@ -5,7 +5,7 @@ import './index.css'
 import App from './App.jsx'
 import AddProdutoPage from './pages/add-produto/AddProduto.jsx'
 import { CookiesProvider } from 'react-cookie'
-import AddUser from './pages/user/AddUser.jsx'
+import Usuario from './pages/user/AddUser.jsx'
 
 let router = createBrowserRouter([
   {
@@ -18,7 +18,7 @@ let router = createBrowserRouter([
   },
   {
     path: "/usuario",
-    Component: AddUser,
+    Component: Usuario,
   },
 ])
 

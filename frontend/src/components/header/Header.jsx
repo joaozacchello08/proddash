@@ -10,7 +10,7 @@ export default function Header() {
                 <Link to={"/novo-produto"} className="nav-link">Adicionar produto</Link>
                 <Link to={"#"} className="nav-link">Vendas</Link>
                 <Link to={"#"} className="nav-link">Lucro</Link>
-                <Link to={"#"} className="nav-link">Usuário</Link>
+                <Link to={"/usuario"} className="nav-link">Usuário</Link>
             </nav>
         </header>
     )

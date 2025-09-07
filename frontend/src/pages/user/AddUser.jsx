@@ -1,10 +1,10 @@
 import "./AddUser.css"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Header from "../../components/header/Header"
 import { useNavigate } from "react-router-dom"
 import { useCookies } from "react-cookie"
 
-export default function AddUser() {
+function AddUser() {
     const [mode, setMode] = useState("register") // "register" ou "login"
     const [username, setUsername] = useState("")
     const [email, setEmail] = useState("")
@@ -163,5 +163,25 @@ export default function AddUser() {
                 </form>
             </div>
         </div>
+    )
+}
+
+function Profile() {
+    return <h1>PROFILE</h1>
+}
+
+export default function Usuario() {
+    const [cookies] = useCookies(["accessToken"])
+    const [logged, setLogged] = useState(false)
+
+    useEffect(() => {
+        if (!cookies["accessToken"]) setLogged(false)
+        else setLogged(true)
+    }, [cookies])
+
+    return (
+        <>
+            {logged ? <Profile /> : <AddUser />}
+        </>
     )
 }
