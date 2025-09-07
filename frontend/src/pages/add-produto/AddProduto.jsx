@@ -32,7 +32,7 @@ export default function AddProdutoPage() {
     const handleSubmit = async (e) => {
         e.preventDefault()
 
-        if (!accessToken) { alert("Não foi possível concluir a operação, pois não foi encontrado o token de acesso (nenhuma conta está logada).") }
+        if (!accessToken) alert("Não foi possível concluir a operação, pois não foi encontrado o token de acesso (nenhuma conta está logada).")
         else {
             const response = await fetch("http://localhost:6969/api/products/", {
                 method: "POST",
@@ -66,7 +66,7 @@ export default function AddProdutoPage() {
                 <form className="add-product-form" onSubmit={handleSubmit}>
                     <h2>Adicionar Novo Produto</h2>
                     <div className="form-group">
-                        <label>Nome do Produto</label>
+                        <label>Nome do Produto <span className="required-input-warn" title="Campo obrigatório">*</span></label>
                         <input type="text" onChange={(e) => setName(e.target.value)} maxLength={100} required />
                     </div>
                     <div className="form-group">
@@ -74,11 +74,11 @@ export default function AddProdutoPage() {
                         <input type="file" accept="image/*" onChange={handleImageUpload} />
                     </div>
                     <div className="form-group">
-                        <label>Preço</label>
+                        <label>Preço <span className="required-input-warn" title="Campo obrigatório">*</span></label>
                         <input type="number" onChange={(e) => setPrice(e.target.value)} required />
                     </div>
                     <div className="form-group">
-                        <label>Custo</label>
+                        <label>Custo <span className="required-input-warn" title="Campo obrigatório">*</span></label>
                         <input type="number" onChange={(e) => setCost(e.target.value)} required />
                     </div>
                     <div className="form-group">

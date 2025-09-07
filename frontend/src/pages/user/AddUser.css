@@ -1,14 +1,13 @@
-.add-product-container {
+.add-user-container {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    gap: 40px;
     padding: 40px 20px;
     background-color: #f4f4f4;
     min-height: calc(100vh - 80px);
 }
 
-.add-product-form {
+.add-user-form {
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -19,7 +18,7 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.add-product-form h2 {
+.add-user-form h2 {
     font-size: 1.8em;
     font-weight: 600;
     color: #2c3e50;
@@ -65,27 +64,14 @@
     transition: background-color 0.3s, transform 0.2s;
 }
 
-.submit-button:hover {
+.submit-button:hover:not(:disabled) {
     background-color: #27ae60;
     transform: translateY(-2px);
 }
 
-.preview-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    max-width: 350px;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    min-height: 400px;
-}
-
-.preview-container h2 {
-    font-size: 1.4em;
-    color: #999;
+.submit-button:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
 }
 
 .required-input-warn {
@@ -115,3 +101,26 @@
     opacity: 1;
     visibility: visible;
 }
+
+.mode-switch {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.mode-switch button {
+    padding: 8px 20px;
+    margin: 0 5px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background-color: #bdc3c7;
+    color: #fff;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+.mode-switch button.active {
+    background-color: #3498db;
+}
+

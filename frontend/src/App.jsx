@@ -1,6 +1,9 @@
 import Product from "./components/product/Product"
 import image from "./assets/image.png"
 import Header from "./components/header/Header"
+import { useNavigate } from "react-router-dom"
+import { useCookies } from "react-cookie"
+import { useEffect } from "react"
 
 const products = [
     {
@@ -54,7 +57,18 @@ const products = [
     }
 ]
 
+
+
 export default function App() {
+    const [cookies] = useCookies(["accessToken"])
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        if (!cookies["accessToken"]) {
+            navigate("/usuario")
+        } 
+    }, [cookies, navigate])
+
     return (
         <div>
             <Header />

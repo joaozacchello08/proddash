@@ -26,7 +26,10 @@ def create_app():
         return html
 
     @app.before_request
-    def secure_requests():        
+    def secure_requests():
+        if request.method == "OPTIONS":
+            return
+
         api_key = request.headers.get("X-API-KEY")
         if api_key != app.config["SECRET_KEY"]:
             return jsonify({ "message": "API key invalid." }), 401 
