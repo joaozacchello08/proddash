@@ -12,10 +12,21 @@ let router = createBrowserRouter([
     path: "/",
     Component: App,
   },
+
   {
     path: "/novo-produto",
     Component: AddProdutoPage,
   },
+  {
+    path: "/editar-produto/:id",
+  },
+  {
+    path: "/vender-produto/:id",
+  },
+  {
+    path: "/deletar-produto/:id",
+  },
+
   {
     path: "/usuario",
     Component: Usuario,

@@ -37,8 +37,8 @@ export default function App() {
                 {Array.isArray(products) && products.length > 0 ? (
                     products.map(product => (
                         <Product
-                            key={product.id}
-                            id={product.id}
+                            key={product.productId}
+                            id={product.productId}
                             productName={product.productName}
                             productImage={product.productImage}
                             productPrice={product.productPrice}

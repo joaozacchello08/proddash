@@ -112,7 +112,7 @@ class Product(db.Model):
     # table args - make product_name and product_barcode unique ONLY on the dashboard
     __table_args__ = (
         UniqueConstraint("dashboardId", "productName", name="_dashboard_product_name_uc"),
-        UniqueConstraint("dashboardId", "productBarcode", name="_dashboard_product_barcode_uc")
+        # UniqueConstraint("dashboardId", "productBarcode", name="_dashboard_product_barcode_uc")
     )
 
     def serialize(self) -> dict:
