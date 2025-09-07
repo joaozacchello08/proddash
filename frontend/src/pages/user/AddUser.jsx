@@ -209,34 +209,37 @@ function Profile() {
     }
 
     return (
-        <div className="profile-container">
-            <h1>Bem-vindo, {displayName}!</h1>
-            
-            <div className="profile-info">
-                <div className="info-card">
-                    <h3>Informações do Usuário</h3>
-                    <p><strong>ID:</strong> {userData.id}</p>
-                    <p><strong>Primeiro Nome:</strong> {userData.firstName || "—"}</p>
-                    <p><strong>Último Nome:</strong> {userData.lastName || "—"}</p>
-                    <p><strong>Criado em:</strong> {new Date(userData.createdAt).toLocaleString()}</p>
+        <>
+            <Header />
+            <div className="profile-container">
+                <h1>Bem-vindo, {displayName}!</h1>
+                
+                <div className="profile-info">
+                    <div className="info-card">
+                        <h3>Informações do Usuário</h3>
+                        <p><strong>ID:</strong> {userData.id}</p>
+                        <p><strong>Primeiro Nome:</strong> {userData.firstName || "—"}</p>
+                        <p><strong>Último Nome:</strong> {userData.lastName || "—"}</p>
+                        <p><strong>Criado em:</strong> {new Date(userData.createdAt).toLocaleString()}</p>
+                    </div>
+
+                    {userData.dashboard && (
+                        <div className="info-card">
+                            <h3>Dashboard</h3>
+                            <p><strong>Nome:</strong> {userData.dashboard.dashboardName}</p>
+                            <p><strong>ID:</strong> {userData.dashboard.id}</p>
+                            <p><strong>Criado em:</strong> {new Date(userData.dashboard.createdAt).toLocaleString()}</p>
+                        </div>
+                    )}
                 </div>
 
-                {userData.dashboard && (
-                    <div className="info-card">
-                        <h3>Dashboard</h3>
-                        <p><strong>Nome:</strong> {userData.dashboard.dashboardName}</p>
-                        <p><strong>ID:</strong> {userData.dashboard.id}</p>
-                        <p><strong>Criado em:</strong> {new Date(userData.dashboard.createdAt).toLocaleString()}</p>
-                    </div>
-                )}
+                <div className="profile-actions">
+                    <button className="logout-button" onClick={handleLogout}>
+                        Logout
+                    </button>
+                </div>
             </div>
-
-            <div className="profile-actions">
-                <button className="logout-button" onClick={handleLogout}>
-                    Logout
-                </button>
-            </div>
-        </div>
+        </>
     )
 }
 

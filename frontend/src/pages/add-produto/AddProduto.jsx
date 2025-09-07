@@ -48,13 +48,15 @@ export default function AddProdutoPage() {
                     productImage: image,
                     productBarcode: barcode,
                     productStock: stock
-                }).then(resp => resp.json())
+                }),
             })
+
+            const data = await response.json()
 
             if (!response.ok) alert(`An error occurred: ${response.message}`)
             else alert("Produto adicionado com sucesso!")
 
-            console.log(JSON.stringify(response, null, 2))
+            // console.log(JSON.stringify(data, null, 2))
         }
     }
 
