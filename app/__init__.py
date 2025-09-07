@@ -19,20 +19,23 @@ def create_app():
     CORS(app)
     register_routes(app)
 
-    @app.route("/", methods=["GET"])
-    def root():
-        with open("./assets/index.html", "r", encoding="utf-8") as f:
-            html = f.read()
-        return html
+    # @app.route("/", methods=["GET"])
+    # def root():
+    #     with open("./assets/index.html", "r", encoding="utf-8") as f:
+    #         html = f.read()
+    #     return html
 
     @app.before_request
     def secure_requests():
         if request.method == "OPTIONS":
             return
 
-        api_key = request.headers.get("X-API-KEY")
-        if api_key != app.config["SECRET_KEY"]:
-            return jsonify({ "message": "API key invalid." }), 401 
+        # the service is working locally for now,
+        # i dont think i need that amount of security
+
+        # api_key = request.headers.get("X-API-KEY")
+        # if api_key != app.config["SECRET_KEY"]:
+        #     return jsonify({ "message": "API key invalid." }), 401
 
     @jwt.token_in_blocklist_loader
     def check_if_token_in_blocklist(jwt_header, jwt_payload):
