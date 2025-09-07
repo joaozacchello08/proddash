@@ -167,7 +167,77 @@ function AddUser() {
 }
 
 function Profile() {
-    return <h1>PROFILE</h1>
+    const [userData, setUserData] = useState(null)
+    const [cookies, , removeCookie] = useCookies(["accessToken"])
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const response = await fetch("http://localhost:6969/api/users/", {
+                    method: "GET",
+                    headers: { Authorization: `Bearer ${cookies.accessToken}` },
+                })
+
+                if (!response.ok) throw new Error("Falha ao buscar dados do usuário.")
+                const data = await response.json()
+                setUserData(data.user)
+            } catch(err) {
+                console.error(err)
+                alert("Erro ao carregar perfil. Faça login novamente.")
+                removeCookie("accessToken")
+                navigate("/")
+            }
+        }
+        
+        fetchProfile()
+    }, [cookies.accessToken])
+
+    const handleLogout = () => {
+        removeCookie("accessToken", { path: "/" })
+        navigate("/")
+    }
+
+    if (!userData) return <p>Carregando perfil...</p>
+
+    // Nova lógica de displayName
+    let displayName = userData.username
+    if (userData.firstName && userData.lastName) {
+        displayName = `${userData.firstName} ${userData.lastName}`
+    } else if (userData.firstName) {
+        displayName = userData.firstName
+    }
+
+    return (
+        <div className="profile-container">
+            <h1>Bem-vindo, {displayName}!</h1>
+            
+            <div className="profile-info">
+                <div className="info-card">
+                    <h3>Informações do Usuário</h3>
+                    <p><strong>ID:</strong> {userData.id}</p>
+                    <p><strong>Primeiro Nome:</strong> {userData.firstName || "—"}</p>
+                    <p><strong>Último Nome:</strong> {userData.lastName || "—"}</p>
+                    <p><strong>Criado em:</strong> {new Date(userData.createdAt).toLocaleString()}</p>
+                </div>
+
+                {userData.dashboard && (
+                    <div className="info-card">
+                        <h3>Dashboard</h3>
+                        <p><strong>Nome:</strong> {userData.dashboard.dashboardName}</p>
+                        <p><strong>ID:</strong> {userData.dashboard.id}</p>
+                        <p><strong>Criado em:</strong> {new Date(userData.dashboard.createdAt).toLocaleString()}</p>
+                    </div>
+                )}
+            </div>
+
+            <div className="profile-actions">
+                <button className="logout-button" onClick={handleLogout}>
+                    Logout
+                </button>
+            </div>
+        </div>
+    )
 }
 
 export default function Usuario() {
@@ -175,8 +245,7 @@ export default function Usuario() {
     const [logged, setLogged] = useState(false)
 
     useEffect(() => {
-        if (!cookies["accessToken"]) setLogged(false)
-        else setLogged(true)
+        setLogged(!!cookies["accessToken"])
     }, [cookies])
 
     return (
