@@ -4,6 +4,7 @@ import { useState } from "react"
 import blankAsset from "../../assets/blank-asset.png"
 import "./AddProduto.css"
 import { useCookies } from "react-cookie"
+import { useNavigate } from "react-router-dom"
 
 export default function AddProdutoPage() {
     const [name, setName] = useState("")
@@ -12,6 +13,7 @@ export default function AddProdutoPage() {
     const [image, setImage] = useState("")
     const [stock, setStock] = useState(0)
     const [barcode, setBarcode] = useState("")
+    const navigate = useNavigate()
 
     let [cookies] = useCookies(["accessToken"])
     let accessToken = cookies["accessToken"]
@@ -54,7 +56,10 @@ export default function AddProdutoPage() {
             const data = await response.json()
 
             if (!response.ok) alert(`An error occurred: ${response.message}`)
-            else alert("Produto adicionado com sucesso!")
+            else {
+                alert("Produto adicionado com sucesso!")
+                navigate("/")
+            }
 
             // console.log(JSON.stringify(data, null, 2))
         }
@@ -77,7 +82,7 @@ export default function AddProdutoPage() {
                     </div>
                     <div className="form-group">
                         <label>Preço <span className="required-input-warn" title="Campo obrigatório">*</span></label>
-                        <input type="number" onChange={(e) => setPrice(e.target.value)} required />
+                        <input type="text" onChange={(e) => setPrice(parseFloat(e.target.value))} required />
                     </div>
                     <div className="form-group">
                         <label>Custo <span className="required-input-warn" title="Campo obrigatório">*</span></label>

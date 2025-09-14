@@ -6,6 +6,7 @@ import App from './App.jsx'
 import AddProdutoPage from './pages/add-produto/AddProduto.jsx'
 import { CookiesProvider } from 'react-cookie'
 import Usuario from './pages/user/AddUser.jsx'
+import { EditarProduto } from './pages/handle-produto/HandleProduto.jsx'
 
 let router = createBrowserRouter([
   {
@@ -19,6 +20,7 @@ let router = createBrowserRouter([
   },
   {
     path: "/editar-produto/:id",
+    Component: EditarProduto
   },
   {
     path: "/vender-produto/:id",

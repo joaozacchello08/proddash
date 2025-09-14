@@ -16,7 +16,7 @@ def create_app():
 
     db.init_app(app)
     jwt.init_app(app)
-    CORS(app)
+    CORS(app, resources={r"/api/*": {"origins": "*"}})
     register_routes(app)
 
     # @app.route("/", methods=["GET"])

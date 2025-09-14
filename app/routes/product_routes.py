@@ -64,7 +64,7 @@ def get_products():
     products = Product.query.filter_by(dashboardId=user.dashboard.id).all()
     return jsonify([product.serialize() for product in products]), 200
 
-@product_bp.route("/<int:product_id>", methods=["GET"])
+@product_bp.route("/<int:product_id>/", methods=["GET"])
 @jwt_required()
 def get_product(product_id: int):
     user_id = get_jwt_identity()

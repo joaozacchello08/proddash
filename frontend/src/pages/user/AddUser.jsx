@@ -3,6 +3,8 @@ import { useEffect, useState } from "react"
 import Header from "../../components/header/Header"
 import { useNavigate } from "react-router-dom"
 import { useCookies } from "react-cookie"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faPenToSquare } from "@fortawesome/free-solid-svg-icons"
 
 function AddUser() {
     const [mode, setMode] = useState("register") // "register" ou "login"
@@ -171,6 +173,11 @@ function Profile() {
     const [cookies, , removeCookie] = useCookies(["accessToken"])
     const navigate = useNavigate()
 
+    //edit
+    const [editFirstName, setEditFirstName] = useState(false)
+    const [editLastName, setEditLastName] = useState(false)
+    const [editDashboardName, setEditDashboardName] = useState(false)
+
     useEffect(() => {
         const fetchProfile = async () => {
             try {
@@ -218,15 +225,27 @@ function Profile() {
                     <div className="info-card">
                         <h3>Informações do Usuário</h3>
                         <p><strong>ID:</strong> {userData.id}</p>
-                        <p><strong>Primeiro Nome:</strong> {userData.firstName || "—"}</p>
-                        <p><strong>Último Nome:</strong> {userData.lastName || "—"}</p>
+
+                        {/* .EDITAVEL */}
+                        <p><strong>Primeiro Nome:</strong> {userData.firstName || "—"} 
+                        <button><FontAwesomeIcon icon={faPenToSquare} /></button></p>
+
+                        <p><strong>Último Nome:</strong> {userData.lastName || "—"} 
+                        <button><FontAwesomeIcon icon={faPenToSquare} /></button></p>
+                        {/* EDITAVEL. */}
+
                         <p><strong>Criado em:</strong> {new Date(userData.createdAt).toLocaleString()}</p>
                     </div>
 
                     {userData.dashboard && (
                         <div className="info-card">
                             <h3>Dashboard</h3>
-                            <p><strong>Nome:</strong> {userData.dashboard.dashboardName}</p>
+
+                            {/* .EDITAVEL */}
+                            <p><strong>Nome:</strong> {userData.dashboard.dashboardName}
+                            <button onClick={() => setEditDashboardName(true)}><FontAwesomeIcon icon={faPenToSquare} /></button></p>
+                            {/* EDITAVEL. */}
+
                             <p><strong>ID:</strong> {userData.dashboard.id}</p>
                             <p><strong>Criado em:</strong> {new Date(userData.dashboard.createdAt).toLocaleString()}</p>
                         </div>
