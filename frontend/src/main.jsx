@@ -36,9 +36,7 @@ let router = createBrowserRouter([
 ])
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <CookiesProvider>
-      <RouterProvider router={router} />
-    </CookiesProvider>
-  </StrictMode>,
+  <CookiesProvider>
+    <RouterProvider router={router} />
+  </CookiesProvider>,
 )

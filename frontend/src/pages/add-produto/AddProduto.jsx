@@ -86,7 +86,7 @@ export default function AddProdutoPage() {
                     </div>
                     <div className="form-group">
                         <label>Custo <span className="required-input-warn" title="Campo obrigatório">*</span></label>
-                        <input type="number" onChange={(e) => setCost(e.target.value)} required />
+                        <input type="text" onChange={(e) => setCost(parseFloat(e.target.value))} required />
                     </div>
                     <div className="form-group">
                         <label>Estoque</label>

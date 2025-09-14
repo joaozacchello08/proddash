@@ -3,7 +3,7 @@ from app.extensions import db
 from app.models import User, Dashboard, TokenBlocklist
 from sqlalchemy import or_
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
-# from dateutil import relativedelta
+import datetime
 
 user_bp = Blueprint("user_bp", __name__)
 
@@ -53,7 +53,7 @@ def create_user():
     
     access_token = create_access_token(
         identity=str(new_user.id),
-        # expires_delta=relativedelta(months=3)
+        expires_delta=datetime.timedelta(days=365)
     )
 
     return jsonify({
@@ -87,7 +87,7 @@ def login():
 
     access_token = create_access_token(
         identity=str(user.id),
-        # expires_delta=relativedelta(months=3)
+        expires_delta=datetime.timedelta(days=365)
     )
 
     return jsonify({ "accessToken": access_token }), 200
