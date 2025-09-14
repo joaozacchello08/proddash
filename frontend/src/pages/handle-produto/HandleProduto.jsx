@@ -57,6 +57,17 @@ function EditarProduto() {
         }
     }, [accessToken, id])
 
+    useEffect(() => {
+        if (productData) {
+            setName(productData.productName || "");
+            setPrice(productData.productPrice || 0);
+            setCost(productData.productCost || 0);
+            setStock(productData.productStock || 0);
+            setBarcode(productData.productBarcode || "");
+            setImage(productData.productImage || "");
+        }
+    }, [productData])
+
     const handleImageUpload = (e) => {
         const file = e.target.files[0]
         if (!file) return
@@ -70,12 +81,48 @@ function EditarProduto() {
         reader.readAsDataURL(file)
     }
 
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+
+        const updates = {}
+        if (name !== productData.productName) updates.productName = name
+        if (price !== productData.productPrice) updates.productPrice = price
+        if (cost !== productData.productCost) updates.productCost = cost
+        if (barcode !== productData.productBarcode) updates.productBarcode = barcode
+        if (stock !== productData.productStock) updates.productStock = stock
+        if (image !== productData.productImage) updates.productImage = image
+
+        if (Object.keys(updates).length === 0) {
+            alert("No changes detected.")
+            navigate("/")
+        }
+
+        const response = await fetch(`http://localhost:6969/api/products/${id}`, {
+            method: "PUT",
+            headers: {
+                "Authorization": `Bearer ${accessToken}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(updates)
+        })
+
+        if (!response.ok) {
+            alert("Erro ao atualizar")
+            const data = await response.json()
+            console.log(JSON.stringify(data))
+            navigate("/")
+        } else {
+            alert("Produto atualizado com sucesso!")
+            navigate("/")
+        }
+    }
+
     return (
         <div>
             <Header />
 
             <div className="product-container">
-                <form className="product-form">
+                <form className="product-form" onSubmit={handleSubmit}>
                     <div style={{ display: "flex", flexDirection: "column" }}>
                         <h2>Editar Produto</h2>
                         <p>Mude os valores do produto para atualizá-los.</p>
@@ -86,7 +133,8 @@ function EditarProduto() {
                         <input
                             type="text"
                             maxLength={100}
-                            value={productData.productName}
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
                         />
                     </div>
                     <div className="form-group">
@@ -101,16 +149,16 @@ function EditarProduto() {
                         <label>Preço</label>
                         <input
                             type="text"
-                            onChange={(e) => setPrice(parseFloat(e.target.value))}
-                            value={productData.productPrice}
+                            onChange={(e) => setPrice(parseFloat(e.target.value) || 0)}
+                            value={price}
                         />
                     </div>
                     <div className="form-group">
                         <label>Custo</label>
                         <input
                             type="text"
-                            onChange={(e) => setCost(parseFloat(e.target.value))}
-                            value={productData.productCost}
+                            onChange={(e) => setCost(parseFloat(e.target.value || 0))}
+                            value={cost}
                         />
                     </div>
                     <div className="form-group">
@@ -118,14 +166,14 @@ function EditarProduto() {
                         <input
                             type="number"
                             onChange={(e) => setStock(e.target.value)}
-                            value={productData.productStock}
+                            value={stock}
                         />
                     </div>
                     <div className="form-group">
                         <label>Código de Barras</label>
                         <input
                             type="text"
-                            value={productData.productBarcode}
+                            value={barcode}
                             onChange={(e) => setBarcode(e.target.value)}
                         />
                     </div>

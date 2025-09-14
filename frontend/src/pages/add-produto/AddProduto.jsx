@@ -18,6 +18,10 @@ export default function AddProdutoPage() {
     let [cookies] = useCookies(["accessToken"])
     let accessToken = cookies["accessToken"]
 
+    if (!accessToken) return (
+        <p>Você não está autenticado.</p>
+    )
+
     const handleImageUpload = (e) => {
         const file = e.target.files[0]
         if (!file) return
@@ -34,34 +38,29 @@ export default function AddProdutoPage() {
     const handleSubmit = async (e) => {
         e.preventDefault()
 
-        if (!accessToken) alert("Não foi possível concluir a operação, pois não foi encontrado o token de acesso (nenhuma conta está logada).")
+        const response = await fetch("http://localhost:6969/api/products/", {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json",
+                "X-API-KEY": import.meta.env.VITE_SECRET_KEY,
+                "Authorization": `Bearer ${accessToken}`
+            },
+            body: JSON.stringify({
+                productName: name,
+                productPrice: price,
+                productCost: cost,
+                productImage: image,
+                productBarcode: barcode,
+                productStock: stock
+            }),
+        })
+
+        // const data = await response.json()
+
+        if (!response.ok) alert(`An error occurred: ${response.message}`)
         else {
-            const response = await fetch("http://localhost:6969/api/products/", {
-                method: "POST",
-                headers: {
-                    "Content-type": "application/json",
-                    "X-API-KEY": import.meta.env.VITE_SECRET_KEY,
-                    "Authorization": `Bearer ${accessToken}`
-                },
-                body: JSON.stringify({
-                    productName: name,
-                    productPrice: price,
-                    productCost: cost,
-                    productImage: image,
-                    productBarcode: barcode,
-                    productStock: stock
-                }),
-            })
-
-            const data = await response.json()
-
-            if (!response.ok) alert(`An error occurred: ${response.message}`)
-            else {
-                alert("Produto adicionado com sucesso!")
-                navigate("/")
-            }
-
-            // console.log(JSON.stringify(data, null, 2))
+            alert("Produto adicionado com sucesso!")
+            navigate("/")
         }
     }
 

@@ -107,12 +107,12 @@ def update_product(product_id: int):
     if not body:
         return jsonify({ "message": "No JSON found on request." }), 400
 
-    product.productName    = body.get("productName", product.productName)
-    product.productPrice   = body.get("productPrice", product.productPrice)
-    product.productCost    = body.get("productCost", product.productCost)
+    product.productName    = body.get("productName",    product.productName)
+    product.productPrice   = body.get("productPrice",   product.productPrice)
+    product.productCost    = body.get("productCost",    product.productCost)
     product.productBarcode = body.get("productBarcode", product.productBarcode)
-    product.productStock   = body.get("productStock", product.productStock)
-    product.productImage   = body.get("productImage", product.productImage)
+    product.productStock   = body.get("productStock",   product.productStock)
+    product.productImage   = body.get("productImage",   product.productImage)
 
     try:
         db.session.commit()
