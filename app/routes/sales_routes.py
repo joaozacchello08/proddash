@@ -31,7 +31,7 @@ def register_sale(product_id: int):
         if not sold_amount:
             return jsonify({ "message": "soldAmount is required." }), 400
 
-        if sold_amount > product.productStock:
+        if int(sold_amount) > product.productStock:
             return jsonify({ "message": "Sold amount is more than actual stock." }), 400
 
         cost_at_sale = product.productCost

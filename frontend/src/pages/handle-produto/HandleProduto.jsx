@@ -14,33 +14,30 @@ function EditarProduto() {
     const navigate = useNavigate()
     const [productData, setProductData] = useState([])
 
-    //edit
+    // edit
     const [name, setName] = useState("")
-    const [cost, setCost] = useState(0)
-    const [price, setPrice] = useState(0)
+    const [cost, setCost] = useState("")   // string
+    const [price, setPrice] = useState("") // string
     const [image, setImage] = useState("")
     const [stock, setStock] = useState(0)
     const [barcode, setBarcode] = useState("")
 
-
-    if (!accessToken) return (
-        <p>Você não está autenticado.</p>
-    )
-
-    if (!id) return (
-        <p>Não foi possivel identificar o produto.</p>
-    )
+    if (!accessToken) return <p>Você não está autenticado.</p>
+    if (!id) return <p>Não foi possivel identificar o produto.</p>
 
     useEffect(() => {
         try {
             const fetchProduct = async () => {
-                const response = await fetch(`http://localhost:6969/api/products/${id}`, { method: "GET", headers: { Authorization: `Bearer ${accessToken}` } })
+                const response = await fetch(`http://localhost:6969/api/products/${id}`, {
+                    method: "GET",
+                    headers: { Authorization: `Bearer ${accessToken}` }
+                })
 
                 if (!response.ok) {
                     alert("Não foi possível encontrar o produto.")
                     navigate("/")
                 }
-                
+
                 const data = await response.json()
                 const product = data.product
                 if (!product) {
@@ -51,7 +48,7 @@ function EditarProduto() {
             }
 
             fetchProduct()
-        } catch(err) {
+        } catch (err) {
             alert(`Error: ${err}`)
             navigate("/")
         }
@@ -59,12 +56,12 @@ function EditarProduto() {
 
     useEffect(() => {
         if (productData) {
-            setName(productData.productName || "");
-            setPrice(productData.productPrice || 0);
-            setCost(productData.productCost || 0);
-            setStock(productData.productStock || 0);
-            setBarcode(productData.productBarcode || "");
-            setImage(productData.productImage || "");
+            setName(productData.productName || "")
+            setPrice(productData.productPrice?.toString() || "")
+            setCost(productData.productCost?.toString() || "")
+            setStock(productData.productStock || 0)
+            setBarcode(productData.productBarcode || "")
+            setImage(productData.productImage || "")
         }
     }, [productData])
 
@@ -73,12 +70,22 @@ function EditarProduto() {
         if (!file) return
 
         const reader = new FileReader()
-
-        reader.onloadend = () => {
-            setImage(reader.result)
-        }
-
+        reader.onloadend = () => setImage(reader.result)
         reader.readAsDataURL(file)
+    }
+
+    // handler para números decimais
+    const handleDecimalInput = (value, setter) => {
+        let val = value.replace(",", ".")           // troca vírgula por ponto
+        val = val.replace(/[^0-9.]/g, "")           // só dígitos e ponto
+        const parts = val.split(".")
+        if (parts.length > 2) {
+            val = parts[0] + "." + parts.slice(1).join("") // só 1 ponto
+        }
+        if (parts[1]) {
+            val = parts[0] + "." + parts[1].slice(0, 2) // 2 casas decimais
+        }
+        setter(val)
     }
 
     const handleSubmit = async (e) => {
@@ -86,8 +93,8 @@ function EditarProduto() {
 
         const updates = {}
         if (name !== productData.productName) updates.productName = name
-        if (price !== productData.productPrice) updates.productPrice = price
-        if (cost !== productData.productCost) updates.productCost = cost
+        if (price !== productData.productPrice?.toString()) updates.productPrice = parseFloat(price) || 0
+        if (cost !== productData.productCost?.toString()) updates.productCost = parseFloat(cost) || 0
         if (barcode !== productData.productBarcode) updates.productBarcode = barcode
         if (stock !== productData.productStock) updates.productStock = stock
         if (image !== productData.productImage) updates.productImage = image
@@ -120,14 +127,13 @@ function EditarProduto() {
     return (
         <div>
             <Header />
-
             <div className="product-container">
                 <form className="product-form" onSubmit={handleSubmit}>
                     <div style={{ display: "flex", flexDirection: "column" }}>
                         <h2>Editar Produto</h2>
                         <p>Mude os valores do produto para atualizá-los.</p>
                     </div>
-                    
+
                     <div className="form-group">
                         <label>Nome do Produto</label>
                         <input
@@ -137,6 +143,7 @@ function EditarProduto() {
                             onChange={(e) => setName(e.target.value)}
                         />
                     </div>
+
                     <div className="form-group">
                         <label>Imagem</label>
                         <input
@@ -145,30 +152,34 @@ function EditarProduto() {
                             onChange={handleImageUpload}
                         />
                     </div>
+
                     <div className="form-group">
                         <label>Preço</label>
                         <input
                             type="text"
-                            onChange={(e) => setPrice(parseFloat(e.target.value) || 0)}
                             value={price}
+                            onChange={(e) => handleDecimalInput(e.target.value, setPrice)}
                         />
                     </div>
+
                     <div className="form-group">
                         <label>Custo</label>
                         <input
                             type="text"
-                            onChange={(e) => setCost(parseFloat(e.target.value || 0))}
                             value={cost}
+                            onChange={(e) => handleDecimalInput(e.target.value, setCost)}
                         />
                     </div>
+
                     <div className="form-group">
                         <label>Estoque</label>
                         <input
                             type="number"
-                            onChange={(e) => setStock(e.target.value)}
                             value={stock}
+                            onChange={(e) => setStock(e.target.value)}
                         />
                     </div>
+
                     <div className="form-group">
                         <label>Código de Barras</label>
                         <input
@@ -187,7 +198,7 @@ function EditarProduto() {
                             id={"Preview"}
                             productName={name || productData.productName}
                             productImage={image || productData.productImage}
-                            productPrice={price || productData.productPrice}
+                            productPrice={parseFloat(price) || productData.productPrice}
                             productStock={stock || productData.productStock}
                             preview={true}
                         />
