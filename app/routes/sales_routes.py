@@ -26,7 +26,7 @@ def register_sale(product_id: int):
 
         sold_amount = body.get("soldAmount")
         price_at_sale = body.get("priceAtSale", product.productPrice)
-        description = body.get("description")
+        description = body.get("description", "")
 
         if not sold_amount:
             return jsonify({ "message": "soldAmount is required." }), 400

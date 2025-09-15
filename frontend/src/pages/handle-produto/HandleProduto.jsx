@@ -200,14 +200,4 @@ function EditarProduto() {
     )
 }
 
-function VenderProduto() {
-    let params = useParams()
-    const id = params.id
-    const [cookie] = useCookies(["accessToken"])
-    const accessToken = cookie["accessToken"]
-
-    if (!id) return <p>Não foi possivel identificar o produto.</p>
-    if (!accessToken) return <p>Você não está autenticado.</p>  
-}
-
-export { EditarProduto, VenderProduto }
+export { EditarProduto }
