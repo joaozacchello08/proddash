@@ -34,7 +34,7 @@ function EditarProduto() {
     useEffect(() => {
         try {
             const fetchProduct = async () => {
-                const response = await fetch(`http://localhost:6969/api/products/${id}/`, { method: "GET", headers: { Authorization: `Bearer ${accessToken}` } })
+                const response = await fetch(`http://localhost:6969/api/products/${id}`, { method: "GET", headers: { Authorization: `Bearer ${accessToken}` } })
 
                 if (!response.ok) {
                     alert("Não foi possível encontrar o produto.")
@@ -199,4 +199,14 @@ function EditarProduto() {
     )
 }
 
-export { EditarProduto }
+function VenderProduto() {
+    let params = useParams()
+    const id = params.id
+    const [cookie] = useCookies(["accessToken"])
+    const accessToken = cookie["accessToken"]
+
+    if (!id) return <p>Não foi possivel identificar o produto.</p>
+    if (!accessToken) return <p>Você não está autenticado.</p>
+}
+
+export { EditarProduto, VenderProduto }
