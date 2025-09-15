@@ -8,7 +8,7 @@ dotenv.load_dotenv()
 key = os.getenv("SECRET_KEY")
 
 # create user
-resp = requests.post(url="http://localhost:6969/api/users/",
+resp = requests.post(url="http://127.0.0.1:8000/api/users/",
                      headers={
                          "Content-type": "application/json",
                          "X-API-KEY": key
@@ -20,14 +20,13 @@ resp = requests.post(url="http://localhost:6969/api/users/",
                      }
 )
 resp = resp.json()
-accessToken = resp["accessToken"]
-# print(json.dumps(resp, indent=4))
-
-resp = requests.get(url="http://localhost:6969/api/users/",
-                    headers={
-                        "X-API-KEY": key,
-                        "Authorization": f"Bearer {accessToken}"
-                    })
-
-resp = resp.json()
 print(json.dumps(resp, indent=4))
+
+# resp = requests.get(url="http://localhost:6969/api/users/",
+#                     headers={
+#                         "X-API-KEY": key,
+#                         "Authorization": f"Bearer {accessToken}"
+#                     })
+
+# resp = resp.json()
+# print(json.dumps(resp, indent=4))
