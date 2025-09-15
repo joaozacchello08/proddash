@@ -106,6 +106,7 @@ export default function AddProdutoPage() {
                             productImage={image}
                             productPrice={price}
                             productStock={stock}
+                            preview={true}
                         />
                     ) : (
                         <h2>PREVIEW DO CARD AQUI</h2>

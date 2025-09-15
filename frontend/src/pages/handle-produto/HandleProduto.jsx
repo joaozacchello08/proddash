@@ -189,6 +189,7 @@ function EditarProduto() {
                             productImage={image || productData.productImage}
                             productPrice={price || productData.productPrice}
                             productStock={stock || productData.productStock}
+                            preview={true}
                         />
                     ) : (
                         <h2>PREVIEW DO CARD AQUI</h2>
