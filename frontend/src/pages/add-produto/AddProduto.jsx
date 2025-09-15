@@ -1,7 +1,6 @@
 import Header from "../../components/header/Header"
 import Product from "../../components/product/Product"
 import { useState } from "react"
-import blankAsset from "../../assets/blank-asset.png"
 import "./AddProduto.css"
 import { useCookies } from "react-cookie"
 import { useNavigate } from "react-router-dom"
@@ -104,7 +103,7 @@ export default function AddProdutoPage() {
                         <Product
                             id={"Preview"}
                             productName={name}
-                            productImage={image || blankAsset}
+                            productImage={image}
                             productPrice={price}
                             productStock={stock}
                         />

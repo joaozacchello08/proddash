@@ -26,6 +26,7 @@ def register_sale(product_id: int):
 
         sold_amount = body.get("soldAmount")
         price_at_sale = body.get("priceAtSale", product.productPrice)
+        description = body.get("description")
 
         if not sold_amount:
             return jsonify({ "message": "soldAmount is required." }), 400
@@ -40,7 +41,8 @@ def register_sale(product_id: int):
             dashboardId=product.dashboardId,
             soldAmount=int(sold_amount),
             priceAtSale=float(price_at_sale),
-            costAtSale=float(cost_at_sale)
+            costAtSale=float(cost_at_sale),
+            description=description
         )
 
         product.productStock -= int(sold_amount)

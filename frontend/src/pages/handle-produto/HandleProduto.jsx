@@ -186,7 +186,7 @@ function EditarProduto() {
                         <Product
                             id={"Preview"}
                             productName={name || productData.productName}
-                            productImage={image || productData.productImage || blankAsset}
+                            productImage={image || productData.productImage}
                             productPrice={price || productData.productPrice}
                             productStock={stock || productData.productStock}
                         />
@@ -206,7 +206,7 @@ function VenderProduto() {
     const accessToken = cookie["accessToken"]
 
     if (!id) return <p>Não foi possivel identificar o produto.</p>
-    if (!accessToken) return <p>Você não está autenticado.</p>
+    if (!accessToken) return <p>Você não está autenticado.</p>  
 }
 
 export { EditarProduto, VenderProduto }

@@ -142,6 +142,8 @@ class Venda(db.Model):
     costAtSale:  Mapped[float]       = mapped_column(db.Float, nullable=True)
     soldAt:      Mapped[datetime]    = mapped_column(db.DateTime, default=lambda: datetime.now())
 
+    description:  Mapped[str]        = mapped_column(db.String(250), nullable=True)
+
     # relationships
     product:     Mapped["Product"]   = relationship(back_populates="sales")
     dashboard:   Mapped["Dashboard"] = relationship(back_populates="sales")
