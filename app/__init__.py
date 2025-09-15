@@ -5,8 +5,8 @@ from .routes import register_routes
 from .models import TokenBlocklist
 import os
 
-def create_app():
-    app = Flask(__name__) 
+def create_app(name: str):
+    app = Flask(name) 
 
     flask_env = os.environ.get("FLASK_ENV", "development")
     if flask_env == "production":
