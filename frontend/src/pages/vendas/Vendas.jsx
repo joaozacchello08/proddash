@@ -67,8 +67,16 @@ export default function Vendas() {
                     <div className="sale-card" key={sale.id}>
                         <h3>{sale.product.productName}</h3>
                         <p><strong>Quantidade:</strong> {sale.soldAmount}</p>
+
+                        <p></p>
+
+                        <p><strong>Preço:</strong> R$ {sale.priceAtSale}</p>
+                        <p><strong>Custo:</strong> R$ {sale.costAtSale}</p>
+
+                        <p></p>
+
                         <p><strong>Data:</strong> {new Date(sale.soldAt).toLocaleString()}</p>
-                        <p><strong>Descrição:</strong> {sale.description || "Sem descrição"}</p>
+                        <p><strong>Descrição:</strong> {sale.description || "Sem descrição especificada."}</p>
                     </div>
                     ))
                 ) : (
