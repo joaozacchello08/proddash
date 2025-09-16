@@ -50,7 +50,7 @@ export default function Product({ id, productName, productImage, productPrice, p
                         Authorization: `Bearer ${accessToken}`,
                         "Content-type": "application/json"
                     },
-                    body: JSON.stringify({ description, soldAmount: amount })
+                    body: JSON.stringify({ description: description, soldAmount: amount })
                 })
 
                 const data = await response.json()

@@ -155,7 +155,9 @@ class Venda(db.Model):
         return {
             "id": self.id,
             "productId": self.productId,
+            "product": self.product.serialize(),
             "dashboardId": self.dashboardId,
+            "description": self.description,
             "soldAmount": self.soldAmount,
             "priceAtSale": self.priceAtSale,
             "costAtSale": self.costAtSale,

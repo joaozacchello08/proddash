@@ -1,0 +1,66 @@
+.sales-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  padding: 30px 15px;
+  background-color: #f4f4f4;
+  min-height: calc(100vh - 80px);
+}
+
+.sale-card {
+  width: 100%;
+  max-width: 250px;
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  /* altura controlada */
+  min-height: auto;
+  height: 100%;
+}
+
+.sale-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
+}
+
+.sale-card h3 {
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 8px;
+  text-align: center;
+
+  white-space: normal;      /* permite quebra */
+  word-wrap: break-word;    /* quebra palavras longas */
+  overflow: hidden;         
+  text-overflow: ellipsis;  
+  display: -webkit-box;     
+  line-clamp: 2;    /* máximo 2 linhas */
+  -webkit-box-orient: vertical;
+}
+
+.sale-card p {
+  font-size: 0.85em;
+  color: #555;
+  margin: 4px 0;
+
+  white-space: normal;
+  word-wrap: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  line-clamp: 3;   /* máximo 3 linhas */
+  -webkit-box-orient: vertical;
+}
+
+
+.no-sales {
+  font-size: 1em;
+  color: #777;
+  margin-top: 20px;
+  text-align: center;
+}

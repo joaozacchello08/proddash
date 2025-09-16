@@ -7,6 +7,7 @@ import { useEffect, useState } from "react"
 
 export default function App() {
     const [cookies] = useCookies(["accessToken"])
+    const accessToken = cookies["accessToken"]
     const [products, setProducts] = useState([])
     // const [dashboardName, setDashboardName] = useState("")
     const navigate = useNavigate()
@@ -27,12 +28,12 @@ export default function App() {
 
             fetchProducts()
         }
-    }, [cookies, navigate])
+    }, [accessToken])
 
     return (
         <div>
             <Header />
-
+            
             <div className="product-grid">
                 {Array.isArray(products) && products.length > 0 ? (
                     products.map(product => (
