@@ -98,6 +98,8 @@ class Product(db.Model):
     productName:     Mapped[str]           = mapped_column(db.String(100), nullable=False)
     productImage:    Mapped[str]           = mapped_column(db.Text, nullable=True)
 
+    isDeleted:       Mapped[bool]          = mapped_column(db.Boolean, default=False)
+
     productPrice:    Mapped[float]         = mapped_column(db.Float, nullable=False)
     productCost:     Mapped[float]         = mapped_column(db.Float, nullable=True)
     productBarcode:  Mapped[str]           = mapped_column(db.String(14), nullable=True)
@@ -125,7 +127,8 @@ class Product(db.Model):
             "productBarcode": self.productBarcode,
             "productStock":   self.productStock,
             "createdAt":      self.createdAt.isoformat() if self.createdAt else None,
-            "productCost":    self.productCost
+            "productCost":    self.productCost,
+            "isDeleted":      self.isDeleted,
         }
 
     def __repr__(self) -> str:

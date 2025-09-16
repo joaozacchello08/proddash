@@ -138,7 +138,7 @@ def delete_product(product_id: int):
         return jsonify({ "message": "Product not found." }), 404
 
     try:
-        db.session.delete(product)
+        product.isDeleted = True
         db.session.commit()
         return jsonify({ "message": "Product deleted successfully." }), 200
     except Exception as e:

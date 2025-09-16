@@ -34,17 +34,20 @@ export default function App() {
         <div>
             <Header />
             
+            {/* <h1>{JSON.stringify({products})}</h1> */}
             <div className="product-grid">
                 {Array.isArray(products) && products.length > 0 ? (
                     products.map(product => (
-                        <Product
-                            key={product.productId}
-                            id={product.productId}
-                            productName={product.productName}
-                            productImage={product.productImage}
-                            productPrice={product.productPrice}
-                            productStock={product.productStock}
-                        />
+                        !product.isDeleted ? 
+                            <Product
+                                key={product.productId}
+                                id={product.productId}
+                                productName={product.productName}
+                                productImage={product.productImage}
+                                productPrice={product.productPrice}
+                                productStock={product.productStock}
+                            />
+                        : ""
                     ))
                 ) : (
                     <p>Sem produtos registrados</p>
