@@ -4,15 +4,27 @@ from .extensions import db, jwt
 from .routes import register_routes
 from .models import TokenBlocklist
 import os
+from .get_sqlite_uri import get_sqlite_uri
+
+class Config:
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SECRET_KEY = os.getenv("SECRET_KEY")
+
+class DevelopmentCfg(Config):
+    SQLALCHEMY_DATABASE_URI = get_sqlite_uri()
+
+class ProductionCfg(Config):
+    pass
+
 
 def create_app():
     app = Flask(__name__) 
 
     flask_env = os.environ.get("FLASK_ENV", "development")
     if flask_env == "production":
-        app.config.from_object("config.ProductionCfg")
+        app.config.from_object(ProductionCfg)
     else:
-        app.config.from_object("config.DevelopmentCfg")
+        app.config.from_object(DevelopmentCfg)
 
     db.init_app(app)
     jwt.init_app(app)
