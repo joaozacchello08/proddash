@@ -2,9 +2,10 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useCookies } from "react-cookie"
 import Header from "../../components/header/Header"
+import { Link } from "react-router-dom"
 import "./Vendas.css"
 
-export default function Vendas() {
+function Vendas() {
     const [cookie] = useCookies(["accessToken"])
     const accessToken = cookie["accessToken"]
     if (!accessToken) return <p>Você não está autenticado.</p>
@@ -65,19 +66,14 @@ export default function Vendas() {
                 {sales.length > 0 ? (
                     sales.map(sale => (
                     <div className="sale-card" key={sale.id}>
-                        <div className="edit-icon">✏️</div>
-                        <div className="confirm-icon">✅</div>
+                        <div className="edit-icon"><Link to={`/vendas/editar-venda/${sale.id}`} style={{ textDecoration: "none" }}>✏️</Link></div>
                         <div className="delete-icon">❌</div>
 
                         <h3>{sale.product.productName}</h3>
                         <p><strong>Quantidade:</strong> {sale.soldAmount}</p>
 
-                        <p></p>
-
                         <p><strong>Preço:</strong> R$ {sale.priceAtSale}</p>
                         <p><strong>Custo:</strong> R$ {sale.costAtSale}</p>
-
-                        <p></p>
 
                         <p><strong>Data:</strong> {new Date(sale.soldAt).toLocaleString()}</p>
                         <p><strong>Descrição:</strong> {sale.description || "Sem descrição especificada."}</p>
@@ -90,3 +86,9 @@ export default function Vendas() {
         </div>
     )
 }
+
+function EditarVenda() {
+    return <h1>editar vendas</h1>
+}
+
+export { Vendas, EditarVenda }
