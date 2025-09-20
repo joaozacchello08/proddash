@@ -65,6 +65,10 @@ export default function Vendas() {
                 {sales.length > 0 ? (
                     sales.map(sale => (
                     <div className="sale-card" key={sale.id}>
+                        <div className="edit-icon">✏️</div>
+                        <div className="confirm-icon">✅</div>
+                        <div className="delete-icon">❌</div>
+
                         <h3>{sale.product.productName}</h3>
                         <p><strong>Quantidade:</strong> {sale.soldAmount}</p>
 
